@@ -83,7 +83,7 @@ canvas{display:block;width:100%;height:100%;touch-action:manipulation}
 .inv small{display:block;font-size:10px;color:var(--muted)}
 #toast{position:absolute;left:50%;top:14px;transform:translateX(-50%);background:var(--panel);border:1px solid var(--accent);color:var(--fg);padding:8px 14px;border-radius:4px;font-size:13px;max-width:min(90%,460px);text-align:center;pointer-events:none;transition:opacity .3s}
 .modal{position:absolute;inset:0;background:rgba(15,16,17,.72);display:grid;place-items:center;padding:16px;overflow:auto}
-.sheet{background:var(--panel);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:4px;max-width:480px;width:100%;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+.sheet{background:var(--panel);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:4px;max-width:540px;width:100%;padding:20px 22px;display:flex;flex-direction:column;gap:12px}
 .sheet h2{margin:0;font-family:var(--display);font-size:30px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;line-height:1;text-wrap:balance}
 .sheet p,.sheet li{margin:0;line-height:1.5;color:#cfcbc1}
 .sheet ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
@@ -94,6 +94,44 @@ canvas{display:block;width:100%;height:100%;touch-action:manipulation}
 .legend{position:absolute;left:12px;bottom:10px;display:flex;gap:10px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:#d9d5ca;pointer-events:none}
 .legend span{display:flex;align-items:center;gap:4px;background:rgba(23,25,27,.75);padding:3px 6px;border-radius:3px}
 .legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.tabs{display:grid;grid-template-columns:1fr 1.4fr 1.2fr;border:1px solid var(--line);border-radius:4px;overflow:hidden;flex:none}
+.tabs button{background:var(--panel2);border:0;border-right:1px solid var(--line);padding:8px 4px;font-family:var(--display);font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;cursor:pointer}
+.tabs button:last-child{border-right:0}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.tabs span{font-family:var(--mono);font-size:10px;letter-spacing:0}
+.pane{display:flex;flex-direction:column;gap:18px}
+.metric{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:9px 10px;display:flex;flex-direction:column;gap:5px}
+.metric .mtop{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.metric .mtop b{font-family:var(--display);font-size:15px;font-weight:600}
+.metric .val{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums}
+.metric p{margin:0;font-size:12px;color:var(--muted);line-height:1.4}
+.link{background:none;border:0;padding:0;color:var(--accent);font-family:var(--mono);font-size:11px;cursor:pointer;text-decoration:underline;text-underline-offset:2px;white-space:nowrap}
+.link:disabled{color:var(--muted);text-decoration:none;cursor:default}
+.ubar{display:grid;grid-template-columns:38px 1fr 36px;align-items:center;gap:6px;font-family:var(--mono);font-size:11px}
+.ubar .bar{height:6px}
+.constraint{border-left:3px solid var(--accent)}
+.constraint .val{font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:.03em;text-transform:uppercase}
+.abc{display:grid;grid-template-columns:auto 1fr auto auto;gap:4px 8px;align-items:center;font-family:var(--mono);font-size:12px}
+.cls{font-weight:600;padding:0 5px;border-radius:2px;background:var(--line)}
+.cls.A{background:var(--accent);color:var(--accent-ink)}
+.man{display:flex;flex-direction:column;gap:6px}
+.man button{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:8px 10px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px}
+.man button b{font-family:var(--display);font-size:16px;font-weight:600}
+.man button small{font-size:12px;color:var(--muted)}
+.man button:disabled{cursor:default;opacity:.55}
+.man .done{color:var(--good)}
+.formula{font-family:var(--mono);font-size:14px;background:var(--bg);border:1px solid var(--line);border-radius:3px;padding:9px 12px;color:var(--accent)}
+.livebox{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.quiz{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.quiz .h em{color:var(--good)}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:8px 10px;text-align:left;cursor:pointer;font-size:14px}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt.right{border-color:var(--good);box-shadow:inset 3px 0 0 var(--good)}
+.opt.wrong{border-color:var(--bad);box-shadow:inset 3px 0 0 var(--bad)}
+.opt:disabled{cursor:default}
+.why{font-size:13px}
+.review{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:10px}
 @media (max-width:980px){
   body{overflow:auto}
   .app{height:auto;grid-template-columns:minmax(0,1fr);grid-template-rows:auto 62vh auto auto;grid-template-areas:"top" "main" "right" "left"}
@@ -155,18 +193,25 @@ canvas{display:block;width:100%;height:100%;touch-action:manipulation}
   </main>
 
   <aside class="panel right">
-    <div class="sec">
-      <div class="h">Outbound orders <em id="oCount">0</em></div>
-      <div class="list" id="orders"></div>
+    <div class="tabs" role="tablist" aria-label="Right panel">
+      <button role="tab" id="tabFloor" data-tab="floor">Floor</button><button role="tab" id="tabEng" data-tab="eng">Engineering</button><button role="tab" id="tabMan" data-tab="man">Manual <span id="manCount">0/9</span></button>
     </div>
-    <div class="sec">
-      <div class="h">Inbound yard <em id="tCount">0</em></div>
-      <div class="list" id="yard"></div>
+    <div id="paneFloor" class="pane">
+      <div class="sec">
+        <div class="h">Outbound orders <em id="oCount">0</em></div>
+        <div class="list" id="orders"></div>
+      </div>
+      <div class="sec">
+        <div class="h">Inbound yard <em id="tCount">0</em></div>
+        <div class="list" id="yard"></div>
+      </div>
+      <div class="sec">
+        <div class="h">Pallets on hand</div>
+        <div class="inv" id="inv"></div>
+      </div>
     </div>
-    <div class="sec">
-      <div class="h">Pallets on hand</div>
-      <div class="inv" id="inv"></div>
-    </div>
+    <div id="paneEng" class="pane" hidden></div>
+    <div id="paneMan" class="pane" hidden></div>
   </aside>
 </div>
 
@@ -202,15 +247,24 @@ function totals(){return {...S.tot};}
 function newGame(){
   S={day:1,t:0,clock:0,cash:3500,rep:100,speed:1,mode:'brief',racks:[],lifts:[],trucks:[],orders:[],nid:1,
     spawn:{truck:2,order:5},up:{bat:0,scan:0,tall:0,dock3:0},prio:'bal',tool:'select',sel:null,fx:[],
-    tot:{shipped:0,late:0,cancel:0,rev:0,fees:0,xd:0,overhead:0},dayStart:null,lastSummary:null};
+    tot:{shipped:0,late:0,cancel:0,rev:0,fees:0,xd:0,overhead:0,lost:0},dayStart:null,lastSummary:null};
+  ensureEng();
   S.dayStart=totals();
   [[4,3,'ST','ST','EL'],[5,3,'EL','EL'],[6,3,'ST'],[4,7,'EL','ST'],[5,7,'ST','ST','EL'],[6,7,'EL']]
     .forEach(([x,y,...items])=>S.racks.push({id:S.nid++,x,y,cold:false,items,out:{},inc:0}));
   rebuildOcc();
   addLift(3,5); addLift(12,5);
 }
+function ensureEng(){
+  S.m=S.m||{tiles:0,empty:0,moves:0,busy:0,arr:[],done:[],mv:[],rUtil:0,sUtil:0};
+  S.heat=S.heat||new Array(W*H).fill(0);
+  S.picks=S.picks||{ST:0,EL:0,TX:0,FZ:0};
+  S.learn=S.learn||{};S.lq=S.lq||[];S.tab=S.tab||'floor';
+  if(S.tot.lost===undefined)S.tot.lost=0;
+  for(const L of S.lifts)if(L.util===undefined)L.util=0;
+}
 function rebuildOcc(){occ.fill(-1);for(const r of S.racks)occ[idx(r.x,r.y)]=r.id;}
-function addLift(x,y){S.lifts.push({id:S.nid++,x,y,cx:x,cy:y,path:[],state:'idle',job:null,carry:null,timer:0,think:0,dir:[1,0],n:S.lifts.length+1});}
+function addLift(x,y){S.lifts.push({id:S.nid++,x,y,cx:x,cy:y,path:[],state:'idle',job:null,carry:null,timer:0,think:0,dir:[1,0],n:S.lifts.length+1,util:0});}
 const rack=id=>S.racks.find(r=>r.id===id);
 const truck=id=>S.trucks.find(t=>t.id===id);
 const order=id=>S.orders.find(o=>o.id===id&&!o.dead&&!o.leave);
@@ -298,7 +352,7 @@ function move(L,dt){
     }
     const dx=tx-L.x,dy=ty-L.y,dist=Math.hypot(dx,dy);
     if(dist>.001)L.dir=Math.abs(dx)>Math.abs(dy)?[Math.sign(dx),0]:[0,Math.sign(dy)];
-    if(dist<=budget){L.x=tx;L.y=ty;L.cx=tx;L.cy=ty;L.path.shift();budget-=dist;}
+    if(dist<=budget){L.x=tx;L.y=ty;L.cx=tx;L.cy=ty;L.path.shift();budget-=dist;S.heat[idx(tx,ty)]+=1;S.m.tiles++;if(!L.carry)S.m.empty++;}
     else{L.x+=dx/dist*budget;L.y+=dy/dist*budget;budget=0;}
   }
   return !L.path.length&&L.x===L.cx&&L.y===L.cy;
@@ -319,9 +373,10 @@ function pickup(L){
 }
 function drop(L){
   const j=L.job;
+  S.m.moves++;S.m.mv.push(S.clock);
   if(j.dst.k==='R'){const r=rack(j.dst.id);r.inc--;r.items.push(j.sku);faceTarget(L,[r.x,r.y]);}
   else{const o=order(j.dst.id);
-    if(o){o.lines[j.dst.line].st=2;faceTarget(L,[W,DOCK_Y[o.dock]]);
+    if(o){o.lines[j.dst.line].st=2;S.picks[j.sku]++;faceTarget(L,[W,DOCK_Y[o.dock]]);
       if(j.src.k==='T'){S.tot.xd++;fxWorld('cross-dock',W-1.5,DOCK_Y[o.dock]+.5,'#f2b705');}
       checkOrder(o);}}
   L.carry=null;idle(L);
@@ -370,13 +425,13 @@ function spawnOrder(){
   for(let i=0;i<n;i++){const s=pickSku(true);lines.push({sku:s,st:0});value+=SKU[s].val;}
   value=Math.round(value*rnd(1,1.25)/10)*10;
   const due=S.clock+48+n*12-S.day*2.5;
-  S.orders.push({id,so:'SO-'+(1000+id),lines,due,born:S.clock,value,dock:-1,arr:0,late:false,leave:0,dead:false});
+  S.orders.push({id,so:'SO-'+(1000+id),lines,due,born:S.clock,value,dock:-1,arr:0,late:false,leave:0,dead:false,starve:0});S.m.arr.push(S.clock);
 }
 function checkOrder(o){
   if(!o.lines.every(l=>l.st===2))return;
   const early=o.due-S.clock>20;
   const pay=Math.round(o.value*(o.late?.6:early?1.15:1));
-  S.cash+=pay;S.tot.rev+=pay;S.tot.shipped++;
+  S.cash+=pay;S.tot.rev+=pay;S.tot.shipped++;S.tot.lost+=o.value-pay>0?o.value-pay:0;S.m.done.push({t:S.clock,lead:S.clock-o.born});
   S.rep=Math.min(100,S.rep+(o.late?0:1.5));
   o.leave=.0001;
   fxWorld('+'+money(pay),W+1,DOCK_Y[o.dock]+.5,'#4fb38a');
@@ -397,9 +452,10 @@ function updTrucks(dt){
   for(const o of q){for(let d=0;d<n;d++)if(!S.orders.some(x=>x.dock===d)){o.dock=d;break;}}
   for(const o of S.orders){
     if(o.dock>=0&&o.arr<1)o.arr=Math.min(1,o.arr+dt/1.4);
+    if(!o.leave&&!o.dead&&o.lines.some(l=>!l.st&&!S.racks.some(r=>avail(r,l.sku)>0)&&!S.trucks.some(t=>t.pallets.some(p=>!p.res&&p.sku===l.sku))))o.starve=(o.starve||0)+dt;
     if(o.leave||o.dead){o.leave=Math.max(o.leave,.0001)+dt/1.2;continue;}
     if(!o.late&&S.clock>o.due){o.late=true;S.tot.late++;S.rep-=5;toast(o.so+' is late. Service level −5.');}
-    if(S.clock>o.due+GRACE){o.dead=true;S.tot.cancel++;S.rep-=8;toast(o.so+' was cancelled by the customer. Service level −8.');}
+    if(S.clock>o.due+GRACE){o.dead=true;S.tot.lost+=o.value;S.tot.cancel++;S.rep-=8;toast(o.so+' was cancelled by the customer. Service level −8.');}
   }
   S.orders=S.orders.filter(o=>!(o.leave>=1));
 }
@@ -411,7 +467,14 @@ function step(dt){
   if(S.spawn.truck<=0){S.spawn.truck=rnd(.8,1.2)*Math.max(8,23-S.day*2.2);if(S.trucks.length<9)spawnTruck();}
   if(S.spawn.order<=0){S.spawn.order=rnd(.8,1.2)*Math.max(5,17-S.day*1.8);if(S.orders.filter(o=>!o.dead&&!o.leave).length<12)spawnOrder();}
   updTrucks(dt);
-  for(const L of S.lifts)updLift(L,dt);
+  for(const L of S.lifts){updLift(L,dt);const busy=L.state!=='idle'?1:0;L.util+=(busy-L.util)*dt/40;S.m.busy+=busy*dt;}
+  const n=doorCount();
+  S.m.rUtil+=(S.trucks.filter(t=>t.dock>=0).length/n-S.m.rUtil)*dt/40;
+  S.m.sUtil+=(S.orders.filter(o=>o.dock>=0).length/n-S.m.sUtil)*dt/40;
+  const k=Math.exp(-dt/300);for(let i=0;i<S.heat.length;i++)S.heat[i]*=k;
+  if(S.m.arr.length>60)S.m.arr=S.m.arr.filter(t=>t>S.clock-200);
+  if(S.m.done.length>60)S.m.done=S.m.done.filter(d=>d.t>S.clock-200);
+  if(S.m.mv.length>200)S.m.mv=S.m.mv.filter(t=>t>S.clock-200);
   if(S.rep<=0){S.rep=0;endGame(false,'Your service level hit 0%. The client moved their freight to another DC.');return;}
   if(S.cash<-2000){endGame(false,'Cash fell below −$2,000. The bank froze the account.');return;}
   if(S.t>=DAY_LEN)endDay();
@@ -421,7 +484,7 @@ function endDay(){
   const over=racks*12+cold*35+lifts*110;
   S.cash-=over;S.tot.overhead+=over;
   const a=S.dayStart,b=S.tot;
-  S.lastSummary={day:S.day,shipped:b.shipped-a.shipped,late:b.late-a.late,cancel:b.cancel-a.cancel,xd:b.xd-a.xd,rev:b.rev-a.rev,fees:b.fees-a.fees,racks,cold,lifts,over};
+  S.lastSummary={day:S.day,lost:(b.lost||0)-(a.lost||0),shipped:b.shipped-a.shipped,late:b.late-a.late,cancel:b.cancel-a.cancel,xd:b.xd-a.xd,rev:b.rev-a.rev,fees:b.fees-a.fees,racks,cold,lifts,over};
   if(S.cash<-2000){endGame(false,'Overheads pushed cash below −$2,000. The bank froze the account.');return;}
   S.mode=S.day>=DAYS?'won':'summary';
   if(S.mode==='won')saveBest();
@@ -506,6 +569,9 @@ function drawFloor(){
     let c=['#8b8d88','#888a85','#8e908b','#868883','#8a8c87','#8c8e89','#878984','#898b86'][h];
     poly([P(x,y),P(x+1,y),P(x+1,y+1),P(x,y+1)],c,'rgba(60,62,60,.35)');
   }
+  if(S.showHeat){let mx=.001;for(const v of S.heat)mx=Math.max(mx,v);
+    for(let y=0;y<H;y++)for(let x=0;x<W;x++){const v=S.heat[idx(x,y)]/mx;if(v<.03)continue;
+      poly([P(x,y),P(x+1,y),P(x+1,y+1),P(x,y+1)],'rgba('+Math.round(240)+','+Math.round(200-150*v)+',40,'+(.15+.65*v)+')');}}
   g.lineWidth=Math.max(1,TW*.03);
   for(const y of [1,4,7,10])poly([P(1,y+.5),P(W-1,y+.5)],null,'rgba(242,183,5,.35)');
   g.lineWidth=1;
@@ -640,6 +706,11 @@ document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',(
 document.querySelectorAll('.speed button').forEach(b=>b.addEventListener('click',()=>{if(S.mode!=='play')return;S.speed=+b.dataset.speed;renderTop();}));
 $('#hire').addEventListener('click',()=>{if(S.mode==='play'){hire();renderPanels();}});
 $('#upgs').addEventListener('click',e=>{const b=e.target.closest('[data-upg]');if(b&&S.mode==='play')buyUpgrade(b.dataset.upg);});
+document.querySelector('.tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b){S.tab=b.dataset.tab;renderRight();}});
+const rightAct=e=>{const b=e.target.closest('[data-lesson]');if(b&&!b.disabled&&S.learn[b.dataset.lesson]&&S.mode!=='lesson'){openLesson(b.dataset.lesson,false);return;}
+  if(e.target.closest('#heatBtn')){S.showHeat=!S.showHeat;$('#paneEng')._h=null;renderRight();}};
+$('.right').addEventListener('pointerdown',e=>{if(e.button===0)rightAct(e);});
+$('.right').addEventListener('click',e=>{if(e.detail===0)rightAct(e);});
 let lastSpeed=1;
 window.addEventListener('keydown',e=>{
   if(e.target.closest&&e.target.closest('input,textarea'))return;
@@ -666,12 +737,18 @@ function renderLeft(){
   $('#fleet').textContent=S.lifts.length+' / '+MAX_LIFTS;
   $('#hire').disabled=S.cash<COST.lift||S.lifts.length>=MAX_LIFTS;
   document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.prio===S.prio));
-  $('#upgs').innerHTML=UPG.map(u=>{const lv=S.up[u.id],maxed=lv>=u.cost.length,c=u.cost[lv];
+  setHTML($('#upgs'),UPG.map(u=>{const lv=S.up[u.id],maxed=lv>=u.cost.length,c=u.cost[lv];
     return '<div class="upg"><div><b>'+u.name+(u.cost.length>1?' '+(lv)+'/'+u.cost.length:'')+'</b><p>'+u.desc+'</p></div>'+
-      '<button class="btn" data-upg="'+u.id+'" '+(maxed||S.cash<c?'disabled':'')+'>'+(maxed?'Done':money(c))+'</button></div>';}).join('');
+      '<button class="btn" data-upg="'+u.id+'" '+(maxed||S.cash<c?'disabled':'')+'>'+(maxed?'Done':money(c))+'</button></div>';}).join(''));
 }
 const chip=(s,cls='')=>'<span class="chip '+cls+'" style="background:'+SKU[s].color+';border-color:'+SKU[s].color+'">'+s+'</span>';
+let engT=0;
 function renderRight(){
+  document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===S.tab));
+  $('#paneFloor').hidden=S.tab!=='floor';$('#paneEng').hidden=S.tab!=='eng';$('#paneMan').hidden=S.tab!=='man';
+  $('#manCount').textContent=Object.keys(S.learn).length+'/'+LESSONS.length;
+  if(S.tab==='eng'){if((engT=(engT+1)%5)===1||!$('#paneEng')._h)renderEng();return;}
+  if(S.tab==='man')return renderMan();
   const os=S.orders.filter(o=>!o.dead&&!o.leave).sort((a,b)=>a.due-b.due);
   $('#oCount').textContent=os.length;
   $('#orders').innerHTML=os.length?os.map(o=>{const left=o.due-S.clock,fr=clamp(left/(o.due-o.born),0,1);
@@ -695,6 +772,31 @@ function renderRight(){
   $('#inv').innerHTML=Object.keys(SKU).map(s=>'<div style="border-top:3px solid '+SKU[s].color+'">'+cnt[s]+'<small>'+s+'</small></div>').join('')+
     '<div style="grid-column:1/-1;font-size:11px;color:var(--muted);text-align:left">Dry slots '+(cnt.ST+cnt.EL+cnt.TX)+'/'+capT+' · Cold slots '+cnt.FZ+'/'+capC+'</div>';
 }
+const learnBtn=id=>'<button class="link" data-lesson="'+id+'" '+(S.learn[id]?'':'disabled')+'>'+(S.learn[id]?'Why?':'locked')+'</button>';
+function metric(title,id,val,body){return '<div class="metric"><div class="mtop"><b>'+title+'</b>'+learnBtn(id)+'</div>'+(val?'<div class="val">'+val+'</div>':'')+(body?'<p>'+body+'</p>':'')+'</div>';}
+function renderEng(){
+  const e=eng(),a=abc();
+  const takt=e.takt?f1(e.takt)+' s':'–',cyc=e.cyc?f1(e.cyc)+' s':'–';
+  const behind=e.cyc&&e.takt&&e.cyc>e.takt*1.1;
+  const u=Math.min(.98,e.util);
+  setHTML($('#paneEng'),
+    '<div class="metric constraint"><div class="mtop"><b>Current constraint</b>'+learnBtn('bottleneck')+'</div><div class="val">'+e.constraint+'</div><p>'+e.cwhy+'</p></div>'+
+    metric('Takt vs. cycle','takt','Takt '+takt+' · Your cycle <span style="color:var(--'+(behind?'bad':'good')+')">'+cyc+'</span>',behind?'You ship slower than customers order. The backlog will grow.':'Time per order demanded vs. time per order shipped, last '+Math.round(e.win)+' s.')+
+    metric("Little's Law",'littles','L '+e.L+' ≈ λ '+f1(e.thr)+'/min × W '+Math.round(e.W)+' s = '+f1(e.thr/60*e.W),'Open orders = throughput × lead time.')+
+    '<div class="metric"><div class="mtop"><b>Forklift utilization</b>'+learnBtn('queueing')+'</div><div class="val">Fleet '+pct(e.util)+' · queue factor u/(1−u) '+f1(u/(1-u))+'</div>'+
+      S.lifts.map(L=>'<div class="ubar"><span>FL-'+L.n+'</span><div class="bar"><i style="width:'+pct(L.util)+';background:var(--'+(L.util>.85?'bad':L.util>.7?'warn':'good')+')"></i></div><span>'+pct(L.util)+'</span></div>').join('')+
+      '<p>Doors: receiving '+pct(S.m.rUtil)+' · shipping '+pct(S.m.sUtil)+'</p></div>'+
+    metric('Capacity check','capacity',f1(e.moveRate)+' moves/min × '+f1(e.cycle)+' s ÷ 85% = '+f1(e.need)+' forklifts','You have '+S.lifts.length+'.')+
+    '<div class="metric"><div class="mtop"><b>Slotting · ABC by picks</b>'+learnBtn('slotting')+'</div><div class="abc">'+
+      a.rows.map(r=>'<span class="cls '+r.cls+'">'+r.cls+'</span><span>'+SKU[r.s].name+'</span><span>'+r.n+'</span><span>'+pct(r.share)+'</span>').join('')+'</div>'+
+      '<p>Travel '+f1(e.travel)+' tiles/move · '+pct(e.emptyPct)+' driven empty</p>'+
+      '<button class="btn wide" id="heatBtn"><span><b>'+(S.showHeat?'Hide':'Show')+' spaghetti heatmap</b><br><small>Where forklifts drive most</small></span></button></div>'+
+    metric('Waste tally (TIMWOOD)','wastes','','Waiting: '+money(S.tot.fees)+' detention · Defects: '+S.tot.late+' late, '+S.tot.cancel+' cancelled ('+money(S.tot.lost)+' revenue lost) · Saved by cross-dock: '+S.tot.xd+' moves'));
+}
+function renderMan(){
+  setHTML($('#paneMan'),'<p class="empty" style="padding:0">Entries unlock when your warehouse runs into each principle. Each has a question worth $250.</p><div class="man">'+
+    LESSONS.map(l=>{const st=S.learn[l.id];return '<button data-lesson="'+l.id+'" '+(st?'':'disabled')+'><b>'+l.name+(st&&st.quiz==='right'?' <span class="done">✓</span>':'')+'</b><small>'+(st?l.formula:l.hint)+'</small></button>';}).join('')+'</div>');
+}
 function renderInspector(){
   const el=$('#insp');
   if(!S.sel){el.innerHTML='Click a forklift or rack on the floor.';return;}
@@ -714,13 +816,14 @@ function renderPanels(){renderTop();renderLeft();renderRight();renderInspector()
 function showModal(){
   const m=$('#modal'),sh=$('#sheet');m.hidden=false;
   if(S.mode==='brief'){
-    sh.innerHTML='<div class="h">Shift briefing · DC-07</div><h2>Keep freight moving</h2>'+
+    sh.innerHTML='<div class="h">Shift briefing · DC-07</div><h2>You are the industrial engineer</h2>'+
       '<p>Inbound trucks back into receiving doors <b>R1–R2</b> on the left. Your forklifts unload them into racks. Outbound orders call a truck to shipping doors <b>S1–S2</b> on the right, and forklifts load it before the deadline.</p>'+
       '<ul><li>Racks near the doors they serve mean shorter trips and faster turns.</li>'+
       '<li>When an inbound pallet matches an open order, forklifts cross-dock it straight across the floor.</li>'+
       '<li>Trucks get '+FREE_WAIT+' s of free time. After that, detention costs $'+DETENTION+'/s.</li>'+
       '<li>Late orders cut your service level. At 0% the client pulls the contract.</li>'+
       '<li>Frozen food starts arriving on day 3 and only fits in cold racks.</li></ul>'+
+      '<p><b>Field manual:</b> as your warehouse runs into real industrial engineering principles (takt time, Little’s Law, bottlenecks, queueing, slotting, Lean waste, safety stock, capacity planning), the game pauses to explain each one with your own numbers. The Engineering tab tracks them live.</p>'+
       '<p>Survive '+DAYS+' shifts. Rack rent and forklift wages are charged at the end of each shift.'+(best()?' Best score so far: '+best().toLocaleString('en-US')+'.':'')+'</p>'+
       '<button class="cta" id="go">Start shift 1</button>';
   }else if(S.mode==='summary'||S.mode==='won'){
@@ -732,34 +835,178 @@ function showModal(){
       '<span>Revenue</span><span class="pos">'+money(s.rev)+'</span><span>Truck detention</span><span class="neg">'+money(-s.fees)+'</span>'+
       '<span>Rack rent ('+s.racks+' dry, '+s.cold+' cold)</span><span class="neg">'+money(-(s.racks*12+s.cold*35))+'</span><span>Forklift wages ('+s.lifts+')</span><span class="neg">'+money(-s.lifts*110)+'</span>'+
       '<span class="tot">Net for the shift</span><span class="tot '+(net<0?'neg':'pos')+'">'+money(net)+'</span><span>Cash on hand</span><span>'+money(S.cash)+'</span><span>Service level</span><span>'+Math.round(S.rep)+'%</span></div>'+
-      (S.mode==='won'?'<p>Final score <b>'+score().toLocaleString('en-US')+'</b> (cash + service level + orders shipped). Best: '+best().toLocaleString('en-US')+'.</p><button class="cta" id="again">Run a new contract</button>'
+      reviewHTML()+(S.mode==='won'?'<p>Final score <b>'+score().toLocaleString('en-US')+'</b> (cash + service level + orders shipped). Best: '+best().toLocaleString('en-US')+'.</p><button class="cta" id="again">Run a new contract</button>'
         :note+'<p>Unfinished trucks and orders carry over. The floor is paused, so you can rebuild before the next shift.</p><button class="cta" id="go">Start shift '+next+'</button>');
+  }else if(S.mode==='lesson'){
+    sh.innerHTML=lessonHTML();
   }else if(S.mode==='over'){
     sh.innerHTML='<div class="h">Contract lost · day '+S.day+'</div><h2>The client walked</h2><p>'+S.why+'</p>'+
       '<div class="ledger"><span>Orders shipped</span><span>'+S.tot.shipped+'</span><span>Cross-docked pallets</span><span>'+S.tot.xd+'</span><span>Late / cancelled</span><span>'+S.tot.late+' / '+S.tot.cancel+'</span><span>Score</span><span>'+score().toLocaleString('en-US')+'</span></div>'+
       '<button class="cta" id="again">Try again</button>';
   }
+  const back=$('#back');
+  if(back){back.onclick=closeLesson;back.focus();}
+  sh.querySelectorAll('[data-opt]').forEach(b=>b.onclick=()=>{const l=lesson(S.lesson),st=S.learn[l.id],i=+b.dataset.opt;
+    if(!st||st.quiz)return;st.pick=i;st.quiz=i===l.a?'right':'wrong';if(st.quiz==='right'){S.cash+=250;}showModal();renderPanels();});
   const go=$('#go'),again=$('#again');
   if(go){go.onclick=()=>{if(S.mode==='summary'){S.day++;S.t=0;S.dayStart=totals();if(S.day===3)toast('Frozen food is now arriving. Use cold racks.');}
     S.mode='play';if(!S.speed)S.speed=1;m.hidden=true;renderPanels();cv.focus&&cv.focus();};go.focus();}
   if(again){again.onclick=()=>{newGame();showModal();renderPanels();};again.focus();}
 }
+function closeLesson(){S.mode=S.lessonFrom||'play';S.lesson=null;if(S.mode==='play')$('#modal').hidden=true;else showModal();renderPanels();}
+function reviewHTML(){
+  const e=eng(),costs=[['Truck detention (waiting)',S.lastSummary.fees],['Late and cancelled orders (defects)',S.lastSummary.lost||0],['Overheads (capacity)',S.lastSummary.over]].sort((a,b)=>b[1]-a[1]);
+  return '<div class="review"><div class="h">Engineering review</div><div class="ledger">'+
+    '<span>Fleet utilization</span><span>'+pct(e.util)+'</span><span>Travel per move</span><span>'+f1(e.travel)+' tiles</span><span>Empty travel</span><span>'+pct(e.emptyPct)+'</span>'+
+    '<span>Forklifts needed at 85%</span><span>'+f1(e.need)+' (have '+S.lifts.length+')</span><span>Constraint at close</span><span>'+e.constraint+'</span></div>'+
+    '<p>Pareto of today’s costs: <b>'+costs[0][0]+'</b> was the biggest at '+money(costs[0][1])+', then '+costs[1][0].toLowerCase()+' at '+money(costs[1][1])+'.</p></div>';
+}
 function hideModalIfPlaying(){$('#modal').hidden=S.mode==='play';}
 
+/* ---------- industrial engineering: metrics ---------- */
+function eng(){
+  const win=Math.max(30,Math.min(180,S.clock));
+  const arr=S.m.arr.filter(t=>t>S.clock-win).length;
+  const done=S.m.done.filter(d=>d.t>S.clock-win);
+  const mv=S.m.mv.filter(t=>t>S.clock-win).length;
+  const demand=arr/win*60, thr=done.length/win*60, moveRate=mv/win*60;
+  const W_=done.length?done.reduce((a,d)=>a+d.lead,0)/done.length:0;
+  const L_=S.orders.filter(o=>!o.dead&&!o.leave).length;
+  const util=S.lifts.length?S.lifts.reduce((a,l)=>a+l.util,0)/S.lifts.length:0;
+  const travel=S.m.moves?S.m.tiles/S.m.moves:0, emptyPct=S.m.tiles?S.m.empty/S.m.tiles:0;
+  const cycle=S.m.moves?S.m.busy/S.m.moves:0;
+  const need=moveRate*cycle/60/.85;
+  const starving=S.orders.filter(o=>!o.dead&&!o.leave&&o.starve>8);
+  let constraint,cwhy;
+  if(util>.85){constraint='Forklifts';cwhy='Fleet is '+pct(util)+' busy. Every other resource is waiting on them.';}
+  else if(S.trucks.some(t=>t.dock<0)||S.orders.some(o=>o.dock<0&&!o.dead)){constraint='Dock doors';cwhy='Trucks and orders are queuing for a free door.';}
+  else if(starving.length){constraint='Inventory';cwhy=starving[0].so+' is waiting on stock that is not in the building.';}
+  else {constraint='Demand';cwhy='Nothing is saturated. Customers set the pace right now.';}
+  return {win,demand,thr,moveRate,W:W_,L:L_,util,travel,emptyPct,cycle,need,starving,constraint,cwhy,
+    takt:demand>0?60/demand:0,cyc:thr>0?60/thr:0};
+}
+function setHTML(el,h){if(el._h!==h){el.innerHTML=h;el._h=h;}}
+const pct=v=>Math.round(v*100)+'%';
+const f1=v=>(Math.round(v*10)/10).toFixed(1);
+function abc(){
+  const tot=Object.values(S.picks).reduce((a,b)=>a+b,0);
+  const rows=Object.keys(SKU).filter(s=>unlocked().includes(s)).map(s=>({s,n:S.picks[s],share:tot?S.picks[s]/tot:0})).sort((a,b)=>b.n-a.n);
+  let cum=0;rows.forEach((r,i)=>{cum+=r.share;r.cls=!tot?'–':i===0||cum-r.share<.5?'A':cum-r.share<.85?'B':'C';});
+  return {rows,tot};
+}
+
+/* ---------- industrial engineering: field manual ---------- */
+const LESSONS=[
+ {id:'takt',name:'Takt time',hint:'Unlocks once a few orders have arrived.',
+  when:e=>S.clock>40&&S.m.arr.length>=3,
+  def:'Takt time is the pace that demand sets. Divide the time you have by the units customers want. If an order arrives every 15 s, you must finish one every 15 s, or the backlog grows forever.',
+  formula:'Takt = available time ÷ customer demand',
+  live:e=>'Orders are arriving about every <b>'+(e.takt?f1(e.takt):'–')+' s</b>. You are shipping one every <b>'+(e.cyc?f1(e.cyc):'–')+' s</b>. '+(e.cyc&&e.takt&&e.cyc>e.takt*1.1?'You are slower than takt, so the order board will keep growing.':'You are keeping pace.'),
+  tryit:'Keep an eye on the Engineering tab. When your cycle is slower than takt, the order board grows.',
+  q:'A DC works a 600-minute shift and must ship 300 orders. What is the takt time?',opts:['2 minutes per order','0.5 minutes per order','300 minutes'],a:0,
+  why:'600 min ÷ 300 orders = 2 minutes per order. (0.5 is the rate, orders per minute, not the takt time.)'},
+ {id:'littles',name:"Little's Law",hint:'Unlocks after 6 shipped orders.',
+  when:e=>S.tot.shipped>=6&&e.W>0,
+  def:'In any stable system, the average number of items inside equals the throughput rate times the average time each item spends inside. It works for queues at a bank, lines in a factory and orders in your DC, whatever the details.',
+  formula:'L = λ × W   (WIP = throughput × lead time)',
+  live:e=>'Throughput λ = <b>'+f1(e.thr)+' orders/min</b>. Average lead time W = <b>'+Math.round(e.W)+' s</b>. So λ × W ≈ <b>'+f1(e.thr/60*e.W)+'</b> orders in process. Right now there are <b>'+e.L+'</b> open orders on the board.',
+  tryit:'To shorten lead time you must either cut work in process or raise throughput. Shipping faster always shows up as fewer open orders.',
+  q:'A warehouse ships 20 orders per hour. Each order spends 3 hours from release to dispatch. On average, how many orders are in process?',opts:['6.7','60','23'],a:1,
+  why:'L = λ × W = 20 orders/h × 3 h = 60 orders.'},
+ {id:'bottleneck',name:'Bottlenecks',hint:'Unlocks when the forklift fleet runs above 85% busy.',
+  when:e=>S.clock>45&&e.util>.85,
+  def:'From the Theory of Constraints: a system moves only as fast as its slowest resource. An hour lost at the bottleneck is lost for the whole warehouse. An hour saved anywhere else changes nothing.',
+  formula:'System throughput = capacity of the constraint',
+  live:e=>'Fleet utilization is <b>'+pct(e.util)+'</b>. Doors: receiving <b>'+pct(S.m.rUtil)+'</b>, shipping <b>'+pct(S.m.sUtil)+'</b>. Current constraint: <b>'+e.constraint+'</b>.',
+  tryit:'Exploit and elevate the constraint: hire a forklift, buy RF scanners (shorter handling) or batteries (shorter trips). More racks will not raise throughput now.',
+  q:'Forklifts are 95% busy and shipping doors are 40% busy. Which investment raises throughput?',opts:['A third shipping door','More racks','Another forklift'],a:2,
+  why:'Only capacity added at the constraint (the forklifts) increases output. The doors already have idle time.'},
+ {id:'queueing',name:'Utilization and queues',hint:'Unlocks the first time a truck pays detention.',
+  when:e=>S.tot.fees>0,
+  def:'Waiting time does not grow in a straight line as resources get busier. Near 100% utilization, small random bursts of arrivals turn into long queues. Kingman’s formula captures it.',
+  formula:'Wait ≈ u ÷ (1 − u) × variability × service time',
+  live:e=>{const u=Math.min(.98,e.util);return 'Your fleet is <b>'+pct(e.util)+'</b> busy, so the u ÷ (1 − u) factor is <b>'+f1(u/(1-u))+'</b>. For comparison: 50% → 1, 80% → 4, 90% → 9, 95% → 19.';},
+  tryit:'Plan for about 80–85% utilization, not 100%. The spare capacity absorbs truck arrivals that bunch up.',
+  q:'Utilization rises from 80% to 90%. Roughly what happens to the u ÷ (1 − u) waiting factor?',opts:['It rises about 10%','It more than doubles, from 4 to 9','It stays the same'],a:1,
+  why:'0.8 ÷ 0.2 = 4 and 0.9 ÷ 0.1 = 9. The last few points of utilization are the most expensive.'},
+ {id:'crossdock',name:'Cross-docking',hint:'Unlocks with your first cross-docked pallet.',
+  when:e=>S.tot.xd>=1,
+  def:'Cross-docking moves goods straight from receiving to shipping. It skips put-away, storage and picking, so two handling moves become one and the pallet never becomes inventory.',
+  formula:'Moves per pallet: store + pick = 2 → cross-dock = 1',
+  live:e=>'You have cross-docked <b>'+S.tot.xd+'</b> pallets, saving about <b>'+S.tot.xd+'</b> forklift moves (≈'+Math.round(S.tot.xd*e.cycle)+' s of fleet time).',
+  tryit:'Balanced and Outbound dispatch let forklifts send matching inbound pallets straight across the floor.',
+  q:'Which Lean waste does cross-docking mainly remove?',opts:['Inventory and extra transport','Defects','Over-production'],a:0,
+  why:'The pallet never sits in a rack (inventory) and skips one trip (transport).'},
+ {id:'slotting',name:'Slotting and ABC analysis',hint:'Unlocks after 30 forklift moves.',
+  when:e=>S.m.moves>=30,
+  def:'Pareto’s rule shows up in every warehouse: a small share of items accounts for most picks. Put the fast-moving A items in slots closest to the doors and let slow C items live at the back. Travel is often half or more of a forklift driver’s day.',
+  formula:'A ≈ top 20% of items ≈ 80% of picks',
+  live:e=>{const a=abc();return 'Average travel is <b>'+f1(e.travel)+' tiles per move</b>. Pick share: '+a.rows.map(r=>'<b>'+r.s+'</b> '+pct(r.share)+' ('+r.cls+')').join(', ')+'. Turn on the heatmap in the Engineering tab to see your spaghetti diagram.';},
+  tryit:'Build racks right next to the shipping doors for your A item. Once racks at the far end are empty, remove them.',
+  q:'In a typical ABC analysis, about what share of items make up 80% of picks?',opts:['About 50%','About 20%','About 80%'],a:1,
+  why:'The Pareto principle: roughly 20% of SKUs drive about 80% of activity.'},
+ {id:'wastes',name:'The 7 wastes (TIMWOOD)',hint:'Unlocks at the start of shift 2.',
+  when:e=>S.day>=2&&S.t>4,
+  def:'Lean names seven wastes, or work that adds cost but no value: Transport, Inventory, Motion, Waiting, Over-production, Over-processing and Defects. Learning to see them is the first step to removing them.',
+  formula:'T · I · M · W · O · O · D',
+  live:e=>{const inv=S.racks.reduce((a,r)=>a+r.items.length,0);return '<b>Transport:</b> '+pct(e.emptyPct)+' of forklift travel was empty. <b>Inventory:</b> '+inv+' pallets parked in racks. <b>Waiting:</b> '+money(S.tot.fees)+' paid in truck detention. <b>Defects:</b> '+S.tot.late+' late and '+S.tot.cancel+' cancelled orders.';},
+  tryit:'Pick your biggest waste above and attack it. Detention means waiting; empty travel means poor slotting or too much distance between doors and racks.',
+  q:'A truck sits at the door for 20 minutes waiting to be unloaded. Which waste is that?',opts:['Motion','Waiting','Defects'],a:1,
+  why:'Idle time for people, equipment or goods is the waste of waiting.'},
+ {id:'safety',name:'Stockouts and safety stock',hint:'Unlocks when an order waits on stock you do not have.',
+  when:e=>e.starving.length>0,
+  def:'When demand arrives for an item you do not have, the order waits however fast your forklifts are. Safety stock is the buffer that covers the variation in demand and supply. It grows with the square root of lead time.',
+  formula:'Safety stock ≈ z × σ(demand) × √(lead time)',
+  live:e=>{const o=e.starving[0];if(!o)return 'No orders are starving for stock right now.';const s=o.lines.find(l=>!l.st&&!S.racks.some(r=>avail(r,l.sku)>0));return '<b>'+o.so+'</b> is waiting on <b>'+(s?SKU[s.sku].name:'stock')+'</b>. There is none in the racks and none on a docked truck.';},
+  tryit:'Keep spare rack space for every item, cold racks included for frozen food, so inbound pallets can be stored rather than stranded.',
+  q:'Supply lead time doubles. About how much more safety stock do you need?',opts:['About 41% more','Twice as much','No change'],a:0,
+  why:'Safety stock scales with √(lead time). √2 ≈ 1.41, so about 41% more.'},
+ {id:'capacity',name:'Capacity planning',hint:'Unlocks at the start of shift 3.',
+  when:e=>S.day>=3&&S.t>4&&S.m.moves>0,
+  def:'How many resources do you need? Multiply the workload by the time each unit takes, then divide by the utilization you are willing to run at. Below the target you are wasting money; above it, queues explode.',
+  formula:'Resources = workload × time per unit ÷ target utilization',
+  live:e=>'You are doing <b>'+f1(e.moveRate)+' moves/min</b> at about <b>'+f1(e.cycle)+' s</b> of forklift time each. At 85% utilization you need about <b>'+f1(e.need)+'</b> forklifts. You have <b>'+S.lifts.length+'</b>.',
+  tryit:'Check this number before each shift and hire to match. Demand rises every day.',
+  q:'Workload is 120 moves per hour, each move takes 2 minutes and target utilization is 80%. How many forklifts?',opts:['4','2','5'],a:2,
+  why:'120 × 2 min = 240 min of work per hour = 4 forklifts at 100%. Divide by 0.8 → 5.'},
+];
+const lesson=id=>LESSONS.find(l=>l.id===id);
+function checkLessons(){
+  if(S.mode!=='play')return;
+  const e=eng();
+  if(S.clock-(S.lastLesson||-99)<25)return;
+  for(const l of LESSONS){if(S.learn[l.id])continue;if(l.when(e)){S.learn[l.id]={quiz:null,at:S.day};S.lastLesson=S.clock;openLesson(l.id,true);return;}}
+}
+function openLesson(id,fresh){
+  S.lessonFrom=S.mode;S.lesson=id;S.lessonFresh=!!fresh;S.mode='lesson';showModal();
+}
+function lessonHTML(){
+  const l=lesson(S.lesson),st=S.learn[l.id]||{},e=eng();
+  const n=Object.keys(S.learn).length;
+  let quiz='<div class="quiz"><div class="h">Check your understanding'+(st.quiz?'':' <em>+$250 if correct</em>')+'</div><p>'+l.q+'</p><div class="opts">'+
+    l.opts.map((o,i)=>'<button class="opt'+(st.quiz?(i===l.a?' right':st.pick===i?' wrong':''):'')+'" data-opt="'+i+'" '+(st.quiz?'disabled':'')+'>'+o+'</button>').join('')+'</div>'+
+    (st.quiz?'<p class="why"><b>'+(st.quiz==='right'?'Correct.':'Not quite.')+'</b> '+l.why+'</p>':'')+'</div>';
+  return '<div class="h">'+(S.lessonFresh?'New field manual entry · '+n+' of '+LESSONS.length:'Field manual')+'</div><h2>'+l.name+'</h2>'+
+    '<p>'+l.def+'</p><div class="formula">'+l.formula+'</div>'+
+    '<div class="livebox"><div class="h">In your warehouse right now</div><p>'+l.live(e)+'</p></div>'+
+    '<p><b>Try this:</b> '+l.tryit+'</p>'+quiz+
+    '<button class="cta" id="back">Back to the floor</button>';
+}
+
 /* ---------- loop ---------- */
-let last=performance.now(),acc=0,uiT=0;
+let last=performance.now(),acc=0,uiT=0,learnT=1;
 function frame(now){
   const real=Math.min(.1,(now-last)/1000);last=now;
   if(S.mode==='play'&&S.speed){let dt=real*S.speed;while(dt>0&&S.mode==='play'){const h=Math.min(.05,dt);step(h);dt-=h;}}
   for(const f of S.fx)f.age+=real;S.fx=S.fx.filter(f=>f.age<1.6);
   if(toastT>0){toastT-=real;if(toastT<=0)$('#toast').style.opacity=0;}
-  uiT-=real;if(uiT<=0){uiT=.2;renderPanels();}
+  uiT-=real;if(uiT<=0){uiT=.2;renderPanels();learnT-=.2;if(learnT<=0){learnT=1;checkLessons();}}
   render();
   requestAnimationFrame(frame);
 }
 
 function boot(data){
-  if(data&&data.S){S=data.S;rebuildOcc();}else newGame();
+  if(data&&data.S){S=data.S;ensureEng();rebuildOcc();}else newGame();
   resize();setTool(S.tool||'select');renderPanels();
   if(S.mode!=='play')showModal();else hideModalIfPlaying();
   requestAnimationFrame(frame);
