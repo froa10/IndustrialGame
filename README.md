@@ -14,3 +14,7 @@ takt time · Little's Law · bottlenecks (Theory of Constraints) · utilization 
 The **Engineering** tab tracks these metrics live: the current constraint, takt vs. cycle time, forklift utilization, ABC pick shares and a spaghetti-diagram heatmap. Each shift ends with an engineering review and a Pareto of that shift's costs.
 
 Controls: 1–4 pick tools · H hire a forklift · Space pause · Esc or right-click returns to Inspect.
+
+## WareTrack live warehouse map
+
+`waretrack.html` is a 3D logistics dashboard with five warehouse sites, a live truck and forklift simulation, and click-to-inspect panels. It is the page body, published as a Claude artifact. Open it in a browser to run it locally. It needs internet access to load three.js from jsDelivr.
