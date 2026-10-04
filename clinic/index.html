@@ -1,0 +1,873 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Site 104 Research Clinic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a clinic operations board. Tool rail left, live floor plan center, schedule and studies right.
+   One committed light look: clinical vinyl and chart paper, with study colors taken from specimen-tube caps. */
+:root{
+  --bg:#e9eeec; --panel:#fbfcfb; --panel2:#f1f4f2; --line:#d3dbd8; --ink:#16302d; --muted:#5d716d;
+  --accent:#0e6b66; --accent-ink:#ffffff; --good:#2f8a4e; --warn:#c77a12; --bad:#c23a3a;
+  --rsv:#d39a12; --epi:#7357c4; --osa:#2c68cc;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+html,body{height:100%}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px;overflow:hidden}
+button{font:inherit;color:inherit}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{height:100%;display:grid;grid-template-columns:262px minmax(0,1fr) 316px;grid-template-rows:auto minmax(0,1fr);grid-template-areas:"top top top" "left main right"}
+.topbar{grid-area:top;display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.mark{width:34px;height:34px;border-radius:50%;background:conic-gradient(var(--rsv) 0 120deg,var(--epi) 120deg 240deg,var(--osa) 240deg);box-shadow:inset 0 0 0 7px var(--panel)}
+.brand b{display:block;font-family:var(--display);font-size:21px;font-weight:800;letter-spacing:-.01em;line-height:1}
+.brand small{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.kpis{display:flex;gap:20px;flex-wrap:wrap}
+.kpi{display:flex;flex-direction:column;gap:2px;min-width:0}
+.kpi label,.h{font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.kpi span{font-family:var(--mono);font-size:14px;font-variant-numeric:tabular-nums}
+.kpi .row{display:flex;align-items:center;gap:7px}
+.meter{width:70px;height:7px;background:var(--panel2);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--good)}
+.enr{display:flex;gap:8px}
+.enr span{display:flex;align-items:center;gap:4px}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.speed{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.speed button{background:var(--panel);border:0;border-right:1px solid var(--line);padding:7px 11px;font-family:var(--mono);font-size:12px;cursor:pointer}
+.speed button:last-child{border-right:0}
+.speed button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.panel{background:var(--panel);overflow:auto;padding:14px 16px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.left{grid-area:left;border-right:1px solid var(--line)}
+.right{grid-area:right;border-left:1px solid var(--line)}
+.sec{display:flex;flex-direction:column;gap:8px}
+.h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.h em{font-style:normal;font-family:var(--mono);letter-spacing:0;text-transform:none;color:var(--ink);font-size:12px;font-weight:400}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.tool,.btn{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:7px 9px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:1px}
+.tool b,.btn b{font-family:var(--display);font-size:14px;font-weight:700}
+.tool small,.btn small{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.tool[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:#e3f0ee}
+.tool:hover,.btn:hover:not(:disabled){border-color:#9db3ae}
+.btn:disabled,.tool:disabled{opacity:.45;cursor:not-allowed}
+.staff{display:flex;flex-direction:column;gap:5px}
+.srow{display:grid;grid-template-columns:12px 1fr auto auto;gap:8px;align-items:center;font-size:13px}
+.srow small{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.mini{background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:3px 8px;font-family:var(--mono);font-size:12px;cursor:pointer}
+.mini:disabled{opacity:.4;cursor:not-allowed}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{background:var(--panel2);border:0;border-right:1px solid var(--line);padding:7px 4px;font-size:12px;cursor:pointer}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--panel);font-weight:600}
+.insp{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:10px;font-size:13px;line-height:1.45;min-height:50px}
+.insp b{font-family:var(--display);font-size:15px}
+.keys{font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.6}
+.stage{grid-area:main;position:relative;min-width:0;min-height:0;background:#dfe6e3}
+canvas{display:block;width:100%;height:100%;touch-action:manipulation}
+.tabs{display:grid;grid-template-columns:repeat(4,auto);border:1px solid var(--line);border-radius:6px;overflow:hidden;flex:none}
+.tabs button{background:var(--panel2);border:0;border-right:1px solid var(--line);padding:8px 6px;font-family:var(--display);font-size:13px;font-weight:700;cursor:pointer}
+.tabs button:last-child{border-right:0}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.tabs span{font-family:var(--mono);font-size:10px;font-weight:400}
+.pane{display:flex;flex-direction:column;gap:16px}
+.list{display:flex;flex-direction:column;gap:5px}
+.card{background:var(--panel2);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:6px;padding:7px 9px;display:flex;flex-direction:column;gap:4px}
+.card .r1{display:flex;justify-content:space-between;gap:8px;font-size:12px;font-variant-numeric:tabular-nums}
+.card .r1 b{font-family:var(--mono);font-weight:600}
+.card .r2{font-size:12px;color:var(--muted)}
+.tag{font-family:var(--mono);font-size:10px;padding:1px 5px;border-radius:3px;background:var(--line);white-space:nowrap}
+.tag.bad{background:var(--bad);color:#fff}.tag.warn{background:var(--warn);color:#fff}.tag.good{background:var(--good);color:#fff}
+.bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%}
+.empty{font-size:12px;color:var(--muted)}
+.funnel{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums}
+.study{border:1px solid var(--line);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:7px;background:var(--panel2)}
+.study .t{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.study .t b{font-family:var(--display);font-size:15px}
+.study p{margin:0;font-size:12px;color:var(--muted)}
+.man{display:flex;flex-direction:column;gap:5px}
+.man button{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:7px 10px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px}
+.man button b{font-family:var(--display);font-size:14px}
+.man button small{font-size:12px;color:var(--muted)}
+.man button:disabled{cursor:default;opacity:.55}
+.done{color:var(--good)}
+#toast{position:absolute;left:50%;top:12px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 14px;border-radius:6px;font-size:13px;max-width:min(90%,480px);text-align:center;pointer-events:none;transition:opacity .3s}
+.modal{position:absolute;inset:0;background:rgba(22,48,45,.45);display:grid;place-items:center;padding:16px;overflow:auto}
+.sheet{background:var(--panel);border:1px solid var(--line);border-top:5px solid var(--accent);border-radius:8px;max-width:560px;width:100%;padding:20px 22px;display:flex;flex-direction:column;gap:11px;box-shadow:0 18px 50px rgba(22,48,45,.25)}
+.sheet h2{margin:0;font-family:var(--display);font-size:27px;font-weight:800;letter-spacing:-.01em;line-height:1.05;text-wrap:balance}
+.sheet p,.sheet li{margin:0;line-height:1.5}
+.sheet ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px}
+.ledger{font-family:var(--mono);font-size:12.5px;display:grid;grid-template-columns:1fr auto;gap:3px 16px;font-variant-numeric:tabular-nums}
+.ledger .neg{color:var(--bad)}.ledger .pos{color:var(--good)}
+.ledger .tot{border-top:1px solid var(--line);padding-top:4px;font-weight:600}
+.formula{font-family:var(--mono);font-size:13.5px;background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:8px 12px;color:var(--accent)}
+.livebox{background:#eef6f4;border:1px solid #c7e0db;border-radius:6px;padding:9px 12px;display:flex;flex-direction:column;gap:3px}
+.quiz{display:flex;flex-direction:column;gap:7px;border-top:1px solid var(--line);padding-top:11px}
+.quiz .h em{color:var(--good)}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:8px 10px;text-align:left;cursor:pointer;font-size:14px;line-height:1.4}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt.right{border-color:var(--good);box-shadow:inset 4px 0 0 var(--good)}
+.opt.wrong{border-color:var(--bad);box-shadow:inset 4px 0 0 var(--bad)}
+.opt:disabled{cursor:default}
+.scenario{background:#fff7e6;border:1px solid #f0d9a8;border-radius:6px;padding:10px 12px}
+.cta{background:var(--accent);color:var(--accent-ink);border:0;border-radius:6px;padding:10px 16px;font-family:var(--display);font-size:16px;font-weight:700;cursor:pointer;align-self:flex-start}
+.legend{position:absolute;left:10px;bottom:8px;display:flex;gap:8px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;pointer-events:none}
+.legend span{display:flex;align-items:center;gap:4px;background:rgba(251,252,251,.85);padding:3px 6px;border-radius:4px}
+@media (max-width:1020px){
+  body{overflow:auto}
+  .app{height:auto;grid-template-columns:minmax(0,1fr);grid-template-rows:auto 60vh auto auto;grid-template-areas:"top" "main" "right" "left"}
+  .left,.right{border:0;border-top:1px solid var(--line);overflow:visible}
+}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+</style>
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><span class="mark" aria-hidden="true"></span><div><b>Site 104 Research Clinic</b><small>3 active protocols · coordinator view</small></div></div>
+    <div class="kpis">
+      <div class="kpi"><label>Clinic day</label><span id="kDay">Day 1 / 10 · 08:00</span></div>
+      <div class="kpi"><label>Cash</label><span id="kCash">$12,000</span></div>
+      <div class="kpi"><label>Quality</label><div class="row"><div class="meter"><i id="kQBar" style="width:100%"></i></div><span id="kQ">100</span></div></div>
+      <div class="kpi"><label>Patient experience</label><div class="row"><div class="meter"><i id="kSBar" style="width:80%"></i></div><span id="kS">80</span></div></div>
+      <div class="kpi"><label>Enrolled</label><span class="enr" id="kEnr"></span></div>
+    </div>
+    <div class="speed" role="group" aria-label="Game speed">
+      <button data-speed="0">Pause</button><button data-speed="1">1×</button><button data-speed="2">2×</button><button data-speed="3">3×</button>
+    </div>
+  </header>
+
+  <aside class="panel left">
+    <div class="sec">
+      <div class="h">Build rooms</div>
+      <div class="tools" id="tools"></div>
+    </div>
+    <div class="sec">
+      <div class="h">Staff <em id="payroll"></em></div>
+      <div class="staff" id="staff"></div>
+    </div>
+    <div class="sec">
+      <div class="h">Staff focus</div>
+      <div class="seg" role="group" aria-label="Staff focus">
+        <button data-focus="pt">Patients</button><button data-focus="bal">Balanced</button><button data-focus="paper">Paperwork</button>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="h">Recruitment ads <em>$400/day per level</em></div>
+      <div class="staff" id="ads"></div>
+    </div>
+    <div class="sec">
+      <div class="h">Investigational product</div>
+      <div class="insp" id="ip"></div>
+    </div>
+    <div class="sec">
+      <div class="h">Inspector</div>
+      <div class="insp" id="insp">Click a person or a room on the floor.</div>
+    </div>
+    <div class="keys">Space pause · Esc or right-click: Inspect</div>
+  </aside>
+
+  <main class="stage" id="stage">
+    <canvas id="cv" aria-label="Clinic floor plan"></canvas>
+    <div class="legend" aria-hidden="true">
+      <span><i class="dot" style="background:var(--rsv)"></i>RSV vaccine</span><span><i class="dot" style="background:var(--epi)"></i>Epilepsy</span><span><i class="dot" style="background:var(--osa)"></i>Sleep apnea</span>
+    </div>
+    <div id="toast" style="opacity:0"></div>
+    <div class="modal" id="modal" hidden><div class="sheet" id="sheet"></div></div>
+  </main>
+
+  <aside class="panel right">
+    <div class="tabs" role="tablist" aria-label="Right panel">
+      <button role="tab" data-tab="today">Today</button><button role="tab" data-tab="tasks">Tasks <span id="taskCount"></span></button><button role="tab" data-tab="studies">Studies</button><button role="tab" data-tab="book">Playbook <span id="bookCount"></span></button>
+    </div>
+    <div class="pane" id="paneToday"></div>
+    <div class="pane" id="paneTasks" hidden></div>
+    <div class="pane" id="paneStudies" hidden></div>
+    <div class="pane" id="paneBook" hidden></div>
+  </aside>
+</div>
+
+<script>
+(()=>{
+const W=14,H=10,DAY_LEN=150,DAYS=10;
+const ENTRY=[0,7];
+const STUDY={
+  RSV:{code:'RSV-OA-301',name:'RSV prefusion F vaccine, adults 60+',color:'#d39a12',unlock:1,target:50,closeDay:8,ads:[9,12,15]},
+  EPI:{code:'EPI-217',name:'Adjunctive therapy, focal epilepsy',color:'#7357c4',unlock:2,target:6,ads:[2,3,4]},
+  OSA:{code:'OSA-140',name:'Oral therapy, obstructive sleep apnea',color:'#2c68cc',unlock:3,target:5,ads:[3,4,5]},
+};
+const ST={
+  consent:{name:'Consent room',cost:1500,role:'CRC'},
+  exam:{name:'Exam room',cost:2500},
+  vax:{name:'Vaccine bay',cost:3000},
+  obs:{name:'Observation chair',cost:400},
+  lab:{name:'Lab bench',cost:2000},
+  eeg:{name:'EEG station',cost:6000},
+  bed:{name:'Sleep lab bed',cost:5000},
+};
+const ROLE={
+  CRC:{name:'Study coordinator',pay:300,color:'#3f5f7f',max:5},
+  RN:{name:'Research nurse',pay:360,color:'#1c8c84',max:5},
+  PI:{name:'Investigator',pay:750,color:'#f3f3ee',max:3},
+  TECH:{name:'Neuro/sleep tech',pay:330,color:'#8a63c9',max:3},
+};
+const VISIT={
+  'RSV-V1':{study:'RSV',label:'Screening + dose',pay:450,failPay:150,steps:[['consent','CRC',8,'Informed consent'],['exam','RN',4,'Vitals + blood draw','sample'],['exam','PI',3,'Eligibility review','eligRSV'],['vax','RN',2,'Vaccination','dose'],['obs',null,8,'Post-dose observation']],next:[['RSV-V2',3,1]]},
+  'RSV-V2':{study:'RSV',label:'Day-3 safety follow-up',pay:150,steps:[['exam','RN',3,'Vitals + injection site'],['consent','CRC',3,'Reactogenicity diary review']]},
+  'EPI-SCR':{study:'EPI',label:'Screening',pay:1200,failPay:600,steps:[['consent','CRC',9,'Informed consent'],['exam','RN',4,'Vitals + labs','sample'],['eeg','TECH',14,'Routine EEG'],['exam','PI',5,'Eligibility review','eligEPI']],next:[['EPI-RAND',2,1]]},
+  'EPI-RAND':{study:'EPI',label:'Baseline + randomization',pay:1500,steps:[['consent','CRC',4,'Seizure diary review'],['exam','PI',4,'Randomize + dispense IP','rand']],next:[['EPI-FU',3,1]]},
+  'EPI-FU':{study:'EPI',label:'Follow-up',pay:700,steps:[['consent','CRC',4,'Seizure diary review'],['exam','RN',4,'Vitals + labs','sample'],['exam','PI',3,'AE review']]},
+  'OSA-SCR':{study:'OSA',label:'Screening',pay:900,steps:[['consent','CRC',8,'Informed consent'],['exam','PI',5,'History + exam'],['bed',null,0,'Booked for overnight PSG','psg']]},
+  'OSA-RAND':{study:'OSA',label:'Randomization',pay:1300,steps:[['exam','RN',4,'Vitals + labs','sample'],['consent','CRC',3,'Randomize + dispense IP','rand']],next:[['OSA-FU',3,1]]},
+  'OSA-FU':{study:'OSA',label:'Follow-up',pay:600,steps:[['exam','RN',3,'Vitals'],['consent','CRC',4,'Epworth scale + AE review']]},
+};
+const WAIT_SPOTS=[];for(let y=6;y<=9;y++)for(let x=1;x<=3;x++)WAIT_SPOTS.push([x,y]);
+const DESKS=[[11,0],[12,0],[13,0]];
+const zone=(x,y)=>(x>=1&&x<=3&&y>=6)?'wait':(x>=10&&y<=1)?'office':(x<=3&&y===5)?'recv':(x===0&&y===7)?'door':null;
+const $=s=>document.querySelector(s);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const ri=(a,b)=>Math.floor(rnd(a,b+1));
+const money=n=>(n<0?'−$':'$')+Math.abs(Math.round(n)).toLocaleString('en-US');
+const pct=v=>Math.round(v*100)+'%';
+function setHTML(el,h){if(el._h!==h){el.innerHTML=h;el._h=h;}}
+function clock(t){const m=480+Math.floor(t/DAY_LEN*540);return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');}
+
+let S;
+function newGame(){
+  S={day:1,t:0,clock:0,cash:12000,quality:100,sat:80,speed:1,mode:'brief',nid:1,
+    stations:[],staff:[],patients:[],subjects:[],appts:[],samples:[],crfs:[],saes:[],devs:[],
+    doses:20,quarantine:0,shipment:0,ads:{RSV:0,EPI:0,OSA:0},focus:'bal',tool:'select',sel:null,tab:'today',
+    psg:[],learn:{},calls:{},lastPop:-99,fx:[],
+    tot:{visits:0,rev:0,screened:{RSV:0,EPI:0,OSA:0},failed:{RSV:0,EPI:0,OSA:0},enrolled:{RSV:0,EPI:0,OSA:0},walkouts:0,lostSamples:0,lateSae:0,waitSum:0,waitN:0,psgDone:0},
+    day0:null,summary:null,nextSubj:{RSV:1,EPI:1,OSA:1}};
+  [['consent',5,2],['exam',7,2],['exam',7,4],['vax',5,6],['obs',5,8],['obs',6,8],['lab',9,7]].forEach(([k,x,y])=>S.stations.push({id:S.nid++,k,x,y,busy:null}));
+  [['PI',11,1],['CRC',12,1],['CRC',13,1],['RN',10,1]].forEach(([r,x,y])=>addStaff(r,x,y));
+  S.day0=JSON.parse(JSON.stringify(S.tot));
+  planDay();
+}
+function addStaff(role,x,y){const n=S.staff.filter(s=>s.role===role).length+1;
+  S.staff.push({id:S.nid++,role,n,x,y,tx:x,ty:y,task:null,state:'idle',idleT:0,busyT:0,util:0});}
+const station=id=>S.stations.find(s=>s.id===id);
+const patient=id=>S.patients.find(p=>p.id===id);
+const staffBy=id=>S.staff.find(s=>s.id===id);
+const subject=id=>S.subjects.find(s=>s.id===id);
+const activeStudies=()=>Object.keys(STUDY).filter(k=>STUDY[k].unlock<=S.day&&!(k==='RSV'&&S.day>STUDY.RSV.closeDay));
+function toast(msg){const t=$('#toast');t.textContent=msg;t.style.opacity=1;toastT=3.4;}
+function fx(txt,x,y,col){S.fx.push({txt,x,y,col,age:0});}
+function dev(sev,text){S.devs.push({day:S.day,sev,text});S.quality=Math.max(0,S.quality-(sev==='major'?7:2));toast((sev==='major'?'Major':'Minor')+' protocol deviation: '+text);}
+
+/* ---------- scheduling ---------- */
+function planDay(){
+  const arrivals=[];
+  for(const a of S.appts.filter(a=>a.day===S.day&&!a.done)){
+    const noShow=Math.random()<.04+(1-S.sat/100)*.25;
+    if(noShow){
+      if(S.day+1<=a.winEnd){a.day++;toast('A '+a.visit+' patient cancelled and rebooked for tomorrow.');}
+      else{a.done=true;const sb=subject(a.subj);dev('minor',sb.code+' missed '+VISIT[a.visit].label.toLowerCase()+' (visit window closed).');scheduleNext(sb,a.visit);}
+      continue;
+    }
+    arrivals.push({subj:a.subj,visit:a.visit,at:rnd(4,DAY_LEN*.55),appt:a});
+  }
+  for(const k of activeStudies()){
+    const n=Math.round(STUDY[k].ads[S.ads[k]]*(.75+S.sat/400)*rnd(.8,1.2));
+    for(let i=0;i<n;i++)arrivals.push({subj:null,study:k,visit:k==='RSV'?'RSV-V1':k+'-SCR',at:rnd(4,DAY_LEN*.72)});
+  }
+  S.arrivals=arrivals.sort((a,b)=>a.at-b.at);
+}
+function scheduleNext(sb,visit){
+  for(const[v,d,w]of(VISIT[visit].next||[]))S.appts.push({id:S.nid++,subj:sb.id,visit:v,day:S.day+d,winEnd:S.day+d+w,done:false});
+  if(!(VISIT[visit].next||[]).length&&sb.status==='randomized')sb.status='completed';
+}
+function spawnPatient(a){
+  let sb=a.subj&&subject(a.subj);
+  if(!sb){const k=a.study;sb={id:S.nid++,study:k,code:k+'-104-'+String(S.nextSubj[k]++).padStart(3,'0'),status:'screening',visits:0};S.subjects.push(sb);S.tot.screened[k]++;}
+  S.patients.push({id:S.nid++,subj:sb.id,study:sb.study,visit:a.visit,step:0,state:'enter',x:ENTRY[0]-1.2,y:ENTRY[1],tx:ENTRY[0],ty:ENTRY[1],station:null,staff:null,timer:0,wait:0,visitWait:0,appt:a.appt?a.appt.id:null,here:false});
+}
+
+/* ---------- movement ---------- */
+const SPEED=3;
+function walk(a,dt){const dx=a.tx-a.x,dy=a.ty-a.y,d=Math.hypot(dx,dy),s=SPEED*dt;if(d<=s){a.x=a.tx;a.y=a.ty;return true;}a.x+=dx/d*s;a.y+=dy/d*s;return false;}
+function freeWaitSpot(pid){const used=new Set(S.patients.filter(p=>p.id!==pid&&p.spot!=null).map(p=>p.spot));for(let i=0;i<WAIT_SPOTS.length;i++)if(!used.has(i))return i;return ri(0,WAIT_SPOTS.length-1);}
+function goWait(p){p.spot=freeWaitSpot(p.id);const[x,y]=WAIT_SPOTS[p.spot];p.tx=x+.5-.5;p.ty=y;p.state='idle';}
+function release(p){p.spot=null;}
+
+/* ---------- dispatch ---------- */
+function stepOf(p){return VISIT[p.visit].steps[p.step];}
+function nearest(list,x,y){let b=null,bd=1e9;for(const o of list){const d=Math.abs(o.x-x)+Math.abs(o.y-y);if(d<bd){bd=d;b=o;}}return b;}
+function idleStaff(role){return S.staff.filter(s=>s.role===role&&!s.task);}
+function tryAssignPatients(){
+  const ready=S.patients.filter(p=>p.state==='idle').sort((a,b)=>b.wait-a.wait);
+  for(const p of ready){
+    const st=stepOf(p);const[k,role,dur,label,fxk]=st;
+    if(fxk==='psg'){finishStep(p);continue;}
+    if(fxk==='dose'&&(S.doses<=0||S.quarantine>0))continue;
+    const free=S.stations.filter(s=>s.k===k&&!s.busy);if(!free.length)continue;
+    const sta=nearest(free,p.x,p.y);
+    let sf=null;if(role){const c=idleStaff(role);if(!c.length)continue;sf=nearest(c,sta.x,sta.y);}
+    sta.busy=p.id;p.station=sta.id;p.state='toStation';release(p);p.tx=sta.x;p.ty=sta.y;p.timer=dur;
+    if(sf){sf.task={k:'step',pid:p.id,sid:sta.id};sf.tx=sta.x+.42;sf.ty=sta.y-.32;p.staff=sf.id;}else p.staff=null;
+    S.tot.waitSum+=p.wait;S.tot.waitN++;p.wait=0;
+  }
+}
+function tryAssignPaper(){
+  for(const sf of S.staff){
+    if(sf.task)continue;
+    if(sf.role==='RN'||sf.role==='CRC'){
+      const smp=S.samples.filter(s=>!s.taken).sort((a,b)=>a.due-b.due)[0];
+      const bench=S.stations.find(s=>s.k==='lab'&&!s.busy);
+      if(smp&&bench&&(sf.role==='RN'||S.focus!=='pt'||smp.due-S.clock<8)){smp.taken=true;bench.busy='lab';sf.task={k:'lab',sample:smp.id,sid:bench.id,timer:3};sf.tx=bench.x+.42;sf.ty=bench.y-.32;continue;}
+    }
+    if(sf.role==='PI'){
+      const sae=S.saes.filter(s=>!s.taken)[0];const desk=freeDesk();
+      if(sae&&desk){sae.taken=true;sf.task={k:'sae',id:sae.id,desk,timer:4};[sf.tx,sf.ty]=[desk[0],desk[1]+.35];continue;}
+    }
+    if(sf.role==='CRC'){
+      const crf=S.crfs.filter(c=>!c.taken).sort((a,b)=>a.due-b.due)[0];const desk=freeDesk();
+      const waiting=S.patients.some(p=>p.state==='idle'&&stepOf(p)[1]==='CRC'&&S.stations.some(s=>s.k===stepOf(p)[0]&&!s.busy));
+      const urgent=crf&&crf.due-S.clock<25;
+      const go=S.focus==='paper'||!waiting||(S.focus==='bal'&&urgent);
+      if(crf&&desk&&go){crf.taken=true;sf.task={k:'crf',id:crf.id,desk,timer:4};[sf.tx,sf.ty]=[desk[0],desk[1]+.35];continue;}
+    }
+  }
+}
+function freeDesk(){const used=S.staff.filter(s=>s.task&&s.task.desk).map(s=>s.task.desk.join());return DESKS.find(d=>!used.includes(d.join()));}
+
+function finishStep(p){
+  const st=stepOf(p),[k,role,dur,label,fxk]=st,sb=subject(p.subj),v=VISIT[p.visit];
+  const sta=p.station&&station(p.station);if(sta)sta.busy=null;p.station=null;
+  const sf=p.staff&&staffBy(p.staff);if(sf){sf.task=null;}p.staff=null;
+  if(fxk==='sample')S.samples.push({id:S.nid++,due:S.clock+18,code:sb.code,taken:false});
+  if(fxk==='dose'){S.doses--;sb.status='randomized';S.tot.enrolled.RSV++;fx('Dosed',p.x,p.y,'#d39a12');}
+  if(fxk==='rand'){sb.status='randomized';S.tot.enrolled[sb.study]++;fx('Randomized',p.x,p.y,STUDY[sb.study].color);}
+  if(fxk==='eligEPI'&&Math.random()>.68)return screenFail(p,sb,'did not meet the baseline seizure count');
+  if(fxk==='eligRSV'&&Math.random()>.9)return screenFail(p,sb,'had an exclusionary condition');
+  if(fxk==='psg'){S.psg.push({subj:sb.id,nights:0});}
+  p.step++;
+  if(p.step>=v.steps.length)return completeVisit(p,v.pay);
+  p.wait=0;goWait(p);
+}
+function screenFail(p,sb,why){
+  sb.status='screen failed';S.tot.failed[sb.study]++;
+  toast(sb.code+' '+why+'. Screen failure.');
+  completeVisit(p,VISIT[p.visit].failPay||0,true);
+}
+function completeVisit(p,pay,failed){
+  const sb=subject(p.subj);sb.visits++;
+  S.cash+=pay;S.tot.rev+=pay;S.tot.visits++;if(pay)fx('+'+money(pay),p.x,p.y,'#2f8a4e');
+  S.crfs.push({id:S.nid++,due:S.clock+DAY_LEN,code:sb.code,visit:VISIT[p.visit].label,taken:false});
+  if(p.appt){const a=S.appts.find(a=>a.id===p.appt);if(a)a.done=true;}
+  if(!failed&&VISIT[p.visit].steps.slice(-1)[0][4]!=='psg')scheduleNext(sb,p.visit);
+  S.sat=clamp(S.sat+(p.visitWait<25?1.2:p.visitWait<50?0:-2),0,100);
+  p.state='leave';release(p);p.tx=ENTRY[0]-1.4;p.ty=ENTRY[1];
+}
+function walkout(p){
+  const sb=subject(p.subj);S.tot.walkouts++;S.sat=clamp(S.sat-6,0,100);
+  const sta=p.station&&station(p.station);if(sta)sta.busy=null;
+  if(p.step===0&&sb.visits===0){sb.status='lost';toast(sb.code+' left before consent. Referral lost.');}
+  else{if(p.appt){const a=S.appts.find(a=>a.id===p.appt);if(a){if(S.day+1<=a.winEnd){a.day=S.day+1;toast(sb.code+' walked out after a long wait and was rebooked.');}else{a.done=true;dev('minor',sb.code+' left mid-visit; visit window missed.');scheduleNext(sb,p.visit);}}}
+    else{sb.status='lost';toast(sb.code+' walked out mid-screening. Subject lost.');}}
+  p.state='leave';release(p);p.tx=ENTRY[0]-1.4;p.ty=ENTRY[1];
+}
+
+/* ---------- sim ---------- */
+function step(dt){
+  S.clock+=dt;S.t+=dt;
+  while(S.arrivals.length&&S.arrivals[0].at<=S.t)spawnPatient(S.arrivals.shift());
+  for(const p of S.patients){
+    if(p.state==='enter'){if(walk(p,dt))goWait(p);continue;}
+    if(p.state==='leave'){if(walk(p,dt))p.state='gone';continue;}
+    walk(p,dt);
+    if(p.state==='idle'){p.wait+=dt;p.visitWait+=dt;if(p.wait>70)walkout(p);}
+    if(p.state==='toStation'&&p.x===p.tx&&p.y===p.ty){
+      const sf=p.staff&&staffBy(p.staff);
+      if(!sf||(sf.x===sf.tx&&sf.y===sf.ty)){p.state='inStep';}
+    }
+    if(p.state==='inStep'){p.timer-=dt;if(p.timer<=0)finishStep(p);}
+  }
+  S.patients=S.patients.filter(p=>p.state!=='gone');
+  for(const sf of S.staff){
+    walk(sf,dt);
+    const busy=!!sf.task;sf.util+=((busy?1:0)-sf.util)*dt/40;
+    if(!sf.task){sf.idleT+=dt;if(sf.idleT>3){const home=sf.role==='PI'?[11,1]:sf.role==='CRC'?[12,1]:sf.role==='RN'?[10,1]:[13,1];sf.tx=home[0]+(sf.n-1)*.25;sf.ty=home[1]+(sf.n-1)*.18;}continue;}
+    sf.idleT=0;
+    const t=sf.task;
+    if(t.k!=='step'&&sf.x===sf.tx&&sf.y===sf.ty){t.timer-=dt;
+      if(t.timer<=0){
+        if(t.k==='lab'){const s=S.samples.find(s=>s.id===t.sample);S.samples=S.samples.filter(x=>x!==s);const b=station(t.sid);if(b)b.busy=null;}
+        if(t.k==='crf'){S.crfs=S.crfs.filter(c=>c.id!==t.id);}
+        if(t.k==='sae'){const s=S.saes.find(x=>x.id===t.id);S.saes=S.saes.filter(x=>x!==s);toast('SAE reported to the sponsor'+(s&&S.clock<=s.due?' within 24 hours.':' late.'));}
+        sf.task=null;
+      }}
+  }
+  for(const s of S.samples)if(!s.taken&&S.clock>s.due&&!s.lost){s.lost=true;S.tot.lostSamples++;dev('minor','sample for '+s.code+' not processed within the stability window.');}
+  S.samples=S.samples.filter(s=>!s.lost);
+  for(const s of S.saes)if(!s.late&&S.clock>s.due){s.late=true;S.tot.lateSae++;dev('major','SAE for '+s.code+' not reported within 24 hours.');}
+  if(S.quarantine>0)S.quarantine=Math.max(0,S.quarantine-dt);
+  if(S.day>=2&&Math.random()<dt*.0022*S.subjects.filter(s=>s.status==='randomized').length){
+    const sb=S.subjects.filter(s=>s.status==='randomized')[ri(0,S.subjects.filter(s=>s.status==='randomized').length-1)];
+    S.saes.push({id:S.nid++,code:sb.code,due:S.clock+55,taken:false,late:false});toast('Site notified: '+sb.code+' was hospitalized. Investigator must report the SAE within 24 hours.');
+  }
+  dispatchT-=dt;if(dispatchT<=0){dispatchT=.25;if(S.focus==='pt'){tryAssignPatients();tryAssignPaper();}else{tryAssignPaper();tryAssignPatients();}}
+  for(const f of S.fx)f.age+=dt/S.speed;S.fx=S.fx.filter(f=>f.age<1.6);
+  if(S.quality<=40){S.quality=Math.max(0,S.quality);endGame('The sponsor suspended enrollment at your site after repeated protocol deviations. Quality fell to '+Math.round(S.quality)+'.');return;}
+  if(S.cash<-8000){endGame('Cash fell below −$8,000. The site could not make payroll.');return;}
+  if(S.t>=DAY_LEN)endDay();
+}
+let dispatchT=0;
+
+function endDay(){
+  const sent=[];
+  for(const p of S.patients){const sb=subject(p.subj);
+    const sta=p.station&&station(p.station);if(sta)sta.busy=null;const sf=p.staff&&staffBy(p.staff);if(sf)sf.task=null;
+    if(p.appt){const a=S.appts.find(a=>a.id===p.appt);if(a&&!a.done)a.day=S.day+1;}else if(sb.visits===0)sb.status='lost';
+    sent.push(sb.code);}
+  S.patients=[];S.arrivals=[];
+  for(const sf of S.staff){if(sf.task&&sf.task.k==='lab'){const b=station(sf.task.sid);if(b)b.busy=null;const smp=S.samples.find(s=>s.id===sf.task.sample);if(smp)smp.taken=false;}
+    if(sf.task&&sf.task.k==='crf'){const c=S.crfs.find(c=>c.id===sf.task.id);if(c)c.taken=false;}
+    if(sf.task&&sf.task.k==='sae'){const c=S.saes.find(c=>c.id===sf.task.id);if(c)c.taken=false;}
+    sf.task=null;}
+  for(const s of S.samples){S.tot.lostSamples++;S.devs.push({day:S.day,sev:'minor',text:'sample for '+s.code+' never processed'});S.quality-=2;}
+  S.samples=[];
+  // night: polysomnography
+  const beds=S.stations.filter(s=>s.k==='bed').length,techs=S.staff.filter(s=>s.role==='TECH').length;
+  const cap=techs?beds:0;const night=[];
+  S.psg.sort((a,b)=>b.nights-a.nights);
+  const tonight=S.psg.splice(0,cap);
+  const gaveUp=[];
+  for(const q of S.psg){q.nights++;S.sat=clamp(S.sat-1,0,100);if(q.nights>=3){const sb=subject(q.subj);sb.status='lost';gaveUp.push(sb.code);}}
+  S.psg=S.psg.filter(q=>q.nights<3);
+  for(const q of tonight){const sb=subject(q.subj);const ahi=Math.round(4+Math.pow(Math.random(),1.1)*42);
+    S.cash+=1100;S.tot.rev+=1100;S.tot.psgDone++;
+    const ok=ahi>=15;night.push({code:sb.code,ahi,ok});
+    if(ok){S.appts.push({id:S.nid++,subj:sb.id,visit:'OSA-RAND',day:S.day+1,winEnd:S.day+3,done:false});}
+    else{sb.status='screen failed';S.tot.failed.OSA++;}
+  }
+  const overdue=S.crfs.filter(c=>S.clock>c.due).length;
+  S.quality=Math.max(0,S.quality-overdue*1);
+  const payroll=S.staff.reduce((a,s)=>a+ROLE[s.role].pay,0),ads=Object.values(S.ads).reduce((a,b)=>a+b,0)*400,rent=1000;
+  S.cash-=payroll+ads+rent;
+  const a=S.day0,b=S.tot;
+  S.summary={gaveUp,day:S.day,visits:b.visits-a.visits,rev:b.rev-a.rev,payroll,ads,rent,night,overdue,sent,walkouts:b.walkouts-a.walkouts,
+    devs:S.devs.filter(d=>d.day===S.day),enrolled:{...b.enrolled},monitor:S.day%3===0?monitorReport():null};
+  if(S.summary.monitor)S.quality=Math.max(0,S.quality-S.summary.monitor.penalty);
+  if(S.quality<=40)return endGame('The sponsor suspended enrollment at your site after the monitoring visit. Quality fell to '+Math.round(S.quality)+'.');
+  if(S.cash<-8000)return endGame('Payroll pushed cash below −$8,000.');
+  S.mode=S.day>=DAYS?'won':'summary';showModal();
+}
+function monitorReport(){
+  const open=S.crfs.length,overdue=S.crfs.filter(c=>S.clock>c.due).length,recent=S.devs.filter(d=>d.day>S.day-3);
+  const major=recent.filter(d=>d.sev==='major').length;
+  const penalty=overdue*1+major*3;
+  return {open,overdue,recent:recent.length,major,penalty};
+}
+function grade(){const e=S.tot.enrolled;const m=['RSV','EPI','OSA'].filter(k=>e[k]>=STUDY[k].target).length;const q=S.quality;
+  if(m===3&&q>=85)return ['A','Top-enrolling site. The sponsor wants you for their next three trials.'];if(m>=2&&q>=70)return ['B','A reliable site. You will be invited back.'];if(m>=1)return ['C','Enrollment was uneven. The sponsor will think twice about the next study.'];return ['D','Targets missed. The sponsor is unlikely to choose Site 104 again.'];}
+function score(){const e=S.tot.enrolled;const pctE=(Math.min(1,e.RSV/STUDY.RSV.target)+Math.min(1,e.EPI/STUDY.EPI.target)+Math.min(1,e.OSA/STUDY.OSA.target))/3;return Math.round(pctE*5000+S.quality*40+S.cash/4);}
+function best(){try{return +localStorage.getItem('site104-best')||0;}catch(e){return 0;}}
+function saveBest(){try{if(score()>best())localStorage.setItem('site104-best',score());}catch(e){}}
+function endGame(why){S.mode='over';S.why=why;saveBest();showModal();}
+
+/* ---------- build ---------- */
+function canBuild(x,y){
+  if(x<0||y<0||x>=W||y>=H)return 'Outside the clinic.';
+  if(zone(x,y))return 'Keep reception, waiting room and the office clear.';
+  if(S.stations.some(s=>s.x===x&&s.y===y))return 'There is already a room here.';
+  return null;
+}
+function build(x,y,k){const c=ST[k].cost;if(S.cash<c)return toast('Not enough cash for a '+ST[k].name.toLowerCase()+'.');
+  const w=canBuild(x,y);if(w)return toast(w);S.cash-=c;S.stations.push({id:S.nid++,k,x,y,busy:null});}
+function removeAt(x,y){const s=S.stations.find(s=>s.x===x&&s.y===y);if(!s)return;if(s.busy)return toast('That room is in use.');
+  S.stations=S.stations.filter(q=>q!==s);S.cash+=Math.round(ST[s.k].cost/2);if(S.sel&&S.sel.id===s.id)S.sel=null;}
+function hire(role){const n=S.staff.filter(s=>s.role===role).length;if(n>=ROLE[role].max)return toast('That team is full.');
+  addStaff(role,ENTRY[0],ENTRY[1]);toast(ROLE[role].name+' hired. Salary '+money(ROLE[role].pay)+' per day.');}
+function letGo(role){const c=S.staff.filter(s=>s.role===role&&!s.task);if(S.staff.filter(s=>s.role===role).length<=(role==='PI'?1:0))return toast(role==='PI'?'Every site needs a principal investigator.':'No one to let go.');
+  if(!c.length)return toast('Everyone on that team is mid-task.');S.staff=S.staff.filter(s=>s!==c[c.length-1]);}
+
+/* ---------- playbook (concept lessons) ---------- */
+const BOOK=[
+ {id:'consent',name:'Informed consent comes first',hint:'Unlocks with your first consent.',when:()=>S.tot.visits>=1||S.subjects.some(s=>s.visits>0),
+  def:'Under ICH E6 Good Clinical Practice, no study-specific procedure happens before the participant gives informed consent: not a blood draw, not an EEG, not a questionnaire. Consent is a conversation, not a signature. The participant needs time to read, ask questions and decide freely, and must know they can withdraw at any time.',
+  formula:'Consent discussion → questions answered → signed and dated → copy given → procedures',
+  live:()=>'Every visit at Site 104 starts in a consent room. You have <b>'+S.stations.filter(s=>s.k==='consent').length+'</b> consent rooms and <b>'+S.staff.filter(s=>s.role==='CRC').length+'</b> coordinators who run them.',
+  tryit:'Consent is the longest screening step. If patients pile up waiting for it, add a consent room or a coordinator.',
+  q:'When can screening labs be drawn for a new participant?',opts:['At check-in, to save time','After the consent form is signed and dated','Whenever the investigator decides'],a:1,
+  why:'All study-specific procedures, including screening labs, must wait until consent has been obtained and documented.'},
+ {id:'funnel',name:'The screening funnel',hint:'Unlocks after your first screen failure.',when:()=>Object.values(S.tot.failed).some(n=>n>0),
+  def:'Not everyone who screens qualifies. Each protocol has inclusion and exclusion criteria, and the screen failure rate tells you how many people you must screen to randomize one. Sites plan recruitment backwards from the target.',
+  formula:'Screens needed = enrollment target ÷ (1 − screen-failure rate)',
+  live:()=>Object.keys(STUDY).filter(k=>S.tot.screened[k]).map(k=>'<b>'+k+'</b>: '+S.tot.screened[k]+' screened, '+S.tot.failed[k]+' failed ('+pct(S.tot.failed[k]/Math.max(1,S.tot.screened[k]))+')').join(' · ')||'No screenings yet.',
+  tryit:'Use recruitment ads on the study that is furthest behind its target. Higher screen-failure studies need more referrals.',
+  q:'You need 10 randomized participants and expect a 50% screen-failure rate. How many people must you screen?',opts:['15','20','10'],a:1,
+  why:'10 ÷ (1 − 0.5) = 20 screenings.'},
+ {id:'reacto',name:'Reactogenicity and post-dose observation',hint:'Unlocks with your first vaccination.',when:()=>S.tot.enrolled.RSV>=1,
+  def:'After a vaccine dose, participants stay under observation, commonly 15 to 30 minutes, so staff can treat a rare immediate allergic reaction. They then record solicited local reactions (pain, redness, swelling) and systemic reactions (fatigue, headache, muscle aches) in a diary, usually for 7 days.',
+  formula:'Dose → observe 15–30 min → 7-day reactogenicity diary → safety follow-up',
+  live:()=>'You have dosed <b>'+S.tot.enrolled.RSV+'</b> RSV participants with <b>'+S.stations.filter(s=>s.k==='obs').length+'</b> observation chairs. When the chairs are full, vaccinated patients wait and the vaccine bay backs up.',
+  tryit:'Observation chairs are cheap. Add them before the vaccine bay becomes your bottleneck.',
+  q:'Which of these is a solicited local reaction?',opts:['Redness at the injection site','A fall at home two weeks later','A headache'],a:0,
+  why:'Local reactions happen at the injection site. Headache is a solicited systemic reaction; a later fall is an unsolicited adverse event.'},
+ {id:'coldchain',name:'Cold chain and IP accountability',hint:'Unlocks when you first use vaccine stock.',when:()=>S.doses<20,
+  def:'Most vaccines must stay at 2–8 °C. Sites log fridge temperatures every day, usually with a min/max thermometer, and every dose is tracked in an accountability log: received, dispensed, returned or destroyed. After a temperature excursion, affected product is quarantined and the sponsor decides whether it can be used.',
+  formula:'Received − dispensed − returned − destroyed = on hand',
+  live:()=>'On hand: <b>'+S.doses+'</b> doses'+(S.quarantine>0?', all quarantined':'')+'. Dispensed so far: <b>'+S.tot.enrolled.RSV+'</b>.',
+  tryit:'Order a resupply shipment before you run out. It arrives the next morning.',
+  q:'The fridge log shows 9.5 °C for an hour overnight. What happens to the doses?',opts:['Use them; an hour is short','Quarantine them and contact the sponsor','Throw them away'],a:1,
+  why:'Quarantine and report. Only the sponsor, using stability data, can release the product; discarding it on your own wastes product that might be usable.'},
+ {id:'samples',name:'Sample handling windows',hint:'Unlocks with your first lab sample.',when:()=>S.samples.length>0||S.tot.lostSamples>0,
+  def:'Protocols specify how quickly blood must be processed: for example, centrifuge within 60 minutes, then freeze. A sample outside its stability window can give wrong results and must be reported as a deviation.',
+  formula:'Draw → (within window) centrifuge → aliquot → freeze → ship',
+  live:()=>'Samples waiting: <b>'+S.samples.length+'</b>. Lost to the window so far: <b>'+S.tot.lostSamples+'</b>. You have <b>'+S.stations.filter(s=>s.k==='lab').length+'</b> lab benches.',
+  tryit:'Keep a nurse free or set staff focus to Balanced so someone processes samples between visits.',
+  q:'Why does a late-processed sample matter if the patient is fine?',opts:['It does not matter','The result may be unreliable and the deviation must be documented','Only the sponsor’s lab cares'],a:1,
+  why:'Data integrity: results from samples outside their stability window may be invalid, which affects the trial’s conclusions.'},
+ {id:'alcoa',name:'Source documents and ALCOA+',hint:'Unlocks when data entry starts to lag.',when:()=>S.crfs.length>=6||S.day>=2&&S.t>30,
+  def:'Everything reported to the sponsor must trace back to source documents. Good records are ALCOA+: Attributable, Legible, Contemporaneous, Original, Accurate, plus Complete, Consistent, Enduring and Available. Entering visit data promptly keeps it contemporaneous and keeps monitors’ queries down.',
+  formula:'A · L · C · O · A  +  Complete · Consistent · Enduring · Available',
+  live:()=>'Case report forms waiting for entry: <b>'+S.crfs.length+'</b>, overdue: <b>'+S.crfs.filter(c=>S.clock>c.due).length+'</b>. Each overdue form costs quality every night and shows up at monitoring visits.',
+  tryit:'Coordinators enter data at office desks. If the backlog grows, hire a coordinator or switch focus to Paperwork for a while.',
+  q:'A coordinator realizes a blood pressure was never written down yesterday. What is the right fix?',opts:['Write a likely value with yesterday’s date','Record it as missing, with today’s date, initials and an explanation','Leave it and hope the monitor misses it'],a:1,
+  why:'Never backdate or invent data. A late entry must be dated when it is made, attributed to the person and explained.'},
+ {id:'sae',name:'Serious adverse events',hint:'Unlocks with your first SAE.',when:()=>S.saes.length>0||S.tot.lateSae>0,
+  def:'An adverse event is serious if it results in death, is life-threatening, requires or prolongs hospitalization, causes persistent disability, is a congenital anomaly, or is another important medical event. The investigator must report an SAE to the sponsor promptly, generally within 24 hours of learning about it, whether or not it seems related to the study drug.',
+  formula:'Aware of SAE → investigator assesses → report to sponsor ≤ 24 h → follow-up',
+  live:()=>'Open SAE reports: <b>'+S.saes.length+'</b>. Late reports so far: <b>'+S.tot.lateSae+'</b>. Only the investigator can file them, from an office desk.',
+  tryit:'When an SAE alert appears, keep your investigator free. Hire a sub-investigator if the PI is always busy in exam rooms.',
+  q:'Which of these is an SAE?',opts:['Injection-site pain for three days','Hospitalization for pneumonia','A mild headache'],a:1,
+  why:'Hospitalization makes an event serious regardless of whether it is related to the study product.'},
+ {id:'epilepsy',name:'Seizure diaries and responder rates',hint:'Unlocks with your first epilepsy screening.',when:()=>S.tot.screened.EPI>=1,
+  def:'Epilepsy drug trials count seizures. Participants keep a daily seizure diary during a baseline period (often 8 weeks) and must meet a minimum seizure frequency to qualify. Efficacy is usually reported as percent change from baseline and as the 50% responder rate: the share of participants whose seizures fell by at least half. A routine EEG supports the diagnosis.',
+  formula:'Percent change = (treatment rate − baseline rate) ÷ baseline rate',
+  live:()=>'EPI-217: <b>'+S.tot.screened.EPI+'</b> screened, <b>'+S.tot.enrolled.EPI+'</b> randomized of 5. Screening needs an EEG station and a tech.',
+  tryit:'EEGs take a long time. One EEG station can handle about 8 screenings a day if a tech is always free.',
+  q:'Baseline: 8 seizures per 28 days. On treatment: 3 per 28 days. Is this participant a 50% responder?',opts:['Yes, a 62.5% reduction','No, a 37.5% reduction','No, they still have seizures'],a:0,
+  why:'(3 − 8) ÷ 8 = −62.5%, more than the 50% threshold.'},
+ {id:'psg',name:'Polysomnography and the AHI',hint:'Unlocks after your first sleep study night.',when:()=>S.tot.psgDone>=1,
+  def:'An overnight polysomnogram (PSG) records brain waves, eye and muscle activity, airflow, breathing effort, oxygen saturation and heart rhythm. The apnea-hypopnea index (AHI) counts breathing pauses and shallow breaths per hour of sleep. Adult OSA severity: 5–15 mild, 15–30 moderate, 30 or more severe.',
+  formula:'AHI = (apneas + hypopneas) ÷ hours of sleep',
+  live:()=>'PSGs completed: <b>'+S.tot.psgDone+'</b>. Waiting for a bed: <b>'+S.psg.length+'</b>. OSA-140 needs AHI ≥ 15. Beds only run overnight with a tech on staff.',
+  tryit:'If patients wait several nights for a bed, add sleep lab beds. Each bed runs one study per night.',
+  q:'A participant has 132 apneas and hypopneas over 6 hours of sleep. What is their AHI and severity?',opts:['22, moderate','132, severe','6, mild'],a:0,
+  why:'132 ÷ 6 = 22 events per hour, in the moderate range (15–30).'},
+ {id:'windows',name:'Visit windows and retention',hint:'Unlocks with your first follow-up visit.',when:()=>S.appts.some(a=>a.done)&&S.appts.length>0,
+  def:'Protocols define when each visit must happen, such as Day 3 ± 1 day. A visit outside the window is a protocol deviation, and missed visits create missing data. Retention depends on patient experience: long waits and rushed visits lead to no-shows and dropouts.',
+  formula:'Target day ± window = acceptable visit dates',
+  live:()=>'Patient experience is <b>'+Math.round(S.sat)+'</b>. Walkouts so far: <b>'+S.tot.walkouts+'</b>. Average wait per step: <b>'+(S.tot.waitN?Math.round(S.tot.waitSum/S.tot.waitN):0)+' s</b>.',
+  tryit:'Follow-up patients arrive in the morning. Keep enough exam rooms and nurses free to see them without long waits.',
+  q:'A Day 7 ± 2 visit is completed on Day 10. What is it?',opts:['On time','A protocol deviation, out of window','Fine if the patient agreed'],a:1,
+  why:'Day 7 ± 2 allows Days 5–9. Day 10 is outside the window and must be documented as a deviation.'},
+ {id:'flow',name:'Patient flow and bottlenecks',hint:'Unlocks when several patients wait for the same step.',when:()=>{const c={};for(const p of S.patients)if(p.state==='idle'){const k=stepOf(p)[0];c[k]=(c[k]||0)+1;}return Object.values(c).some(n=>n>=4);},
+  def:'A clinic is a production line. Each patient visit is a route through rooms and staff, and the slowest one sets the pace for everyone. Little’s Law applies too: patients in clinic = arrival rate × time in clinic. Cutting waits at the bottleneck shortens every visit.',
+  formula:'Patients in clinic = arrival rate × average time in clinic',
+  live:()=>{const c={};for(const p of S.patients)if(p.state==='idle'){const k=stepOf(p);const key=ST[k[0]].name+(k[1]?' + '+ROLE[k[1]].name.toLowerCase():'');c[key]=(c[key]||0)+1;}const top=Object.entries(c).sort((a,b)=>b[1]-a[1])[0];return top?'Longest queue right now: <b>'+top[0]+'</b> with <b>'+top[1]+'</b> patients waiting.':'No queues right now.';},
+  tryit:'Find the step with the longest queue and add the room or the staff role it needs, whichever is always busy.',
+  q:'A clinic sees 4 patients an hour and each stays 1.5 hours. On average, how many patients are in the clinic?',opts:['2.7','6','5.5'],a:1,
+  why:'Little’s Law: 4 per hour × 1.5 hours = 6 patients.'},
+];
+/* ---------- judgment calls (decision events) ---------- */
+const CALLS=[
+ {id:'rush',when:()=>S.day===1&&S.t>45&&S.patients.length>=3,title:'The schedule is slipping',
+  text:'Mrs. D. arrives for RSV screening. The waiting room is full, and a coordinator suggests drawing her screening blood now and doing the consent discussion afterward to save time.',
+  opts:[{t:'Draw the blood now, consent afterward',q:-12,why:'Any study procedure before consent is a major GCP violation. The sample cannot be used, and the deviation must be reported to the sponsor and the ethics committee.'},
+        {t:'Consent first, even if she waits a little longer',q:+2,ok:1,why:'Correct. Consent always comes before study procedures. Fix the schedule instead: add a consent room or a coordinator.'},
+        {t:'Ask her to sign quickly without reading',q:-8,why:'Consent must be informed. Rushing a signature without discussion defeats its purpose and is a GCP finding.'}]},
+ {id:'excursion',when:()=>S.day>=2&&S.t>20&&S.tot.enrolled.RSV>=3,title:'Fridge temperature excursion',
+  text:'This morning’s min/max log shows the vaccine fridge reached 10.2 °C for about 40 minutes overnight. Twelve patients are booked for vaccination today.',
+  opts:[{t:'Use the doses; 40 minutes is short',q:-14,why:'Dosing product with an unresolved excursion is a major deviation. Only the sponsor, using stability data, can release it.'},
+        {t:'Quarantine the doses, report to the sponsor and wait for their decision',q:+3,ok:1,quar:40,why:'Correct. Label the doses “quarantined, do not use”, report the excursion and wait for the sponsor’s assessment. Vaccinations pause for a short time.'},
+        {t:'Throw the doses away and order new ones',q:-2,cash:-1500,wipe:1,why:'Discarding product on your own destroys doses that might be usable and breaks accountability. The sponsor decides.'}]},
+ {id:'diary',when:()=>S.tot.enrolled.EPI>=1&&S.day>=3,title:'A blank seizure diary',
+  text:'An EPI-217 participant arrives with a seizure diary that is blank for the last 9 days. The coordinator suggests having the participant fill in those days from memory right now.',
+  opts:[{t:'Have them fill in the old dates now, as if written at the time',q:-10,why:'That creates non-contemporaneous data presented as contemporaneous, which breaks ALCOA+.'},
+        {t:'Record the gap as missing, document what the participant recalls as a dated late entry and retrain them',q:+2,ok:1,why:'Correct. Missing data is documented honestly, late entries are dated and attributed, and retraining helps prevent repeats.'},
+        {t:'Withdraw the participant',q:-3,why:'Missing diary days usually do not require withdrawal. Withdrawal loses the participant’s data and should follow the protocol.'}]},
+ {id:'ahi',when:()=>S.tot.psgDone>=1&&S.day>=4,title:'“Close enough”',
+  text:'An OSA-140 candidate’s PSG shows an AHI of 13. The protocol requires 15 or more. The candidate is keen, and someone on the team says the investigator can approve it as close enough.',
+  opts:[{t:'Enroll; it is only 2 events per hour',q:-12,why:'Enrolling ineligible participants is a major deviation. Sponsors do not grant eligibility waivers, and the data may be excluded.'},
+        {t:'Record a screen failure and thank the candidate',q:+2,ok:1,why:'Correct. Eligibility criteria protect participants and data quality. Rescreening, if allowed, must follow the protocol’s rules.'},
+        {t:'Repeat the PSG until the AHI reaches 15',q:-6,why:'Repeating tests to get a qualifying result, unless the protocol allows a defined rescreen, biases enrollment.'}]},
+ {id:'blind',when:()=>S.tot.enrolled.EPI+S.tot.enrolled.OSA>=2&&S.day>=4,title:'“Did I get the real drug?”',
+  text:'A participant in a double-blind trial asks the coordinator which arm they are in. The coordinator could find out by calling the pharmacy.',
+  opts:[{t:'Find out and tell them, quietly',q:-12,why:'Breaking the blind without a medical reason compromises the trial’s results and is a major deviation.'},
+        {t:'Explain why neither the participant nor the site knows, and that the investigator can unblind only for a medical emergency',q:+2,ok:1,why:'Correct. Blinding prevents bias. Emergency unblinding goes through the investigator and the randomization system, and is documented.'},
+        {t:'Tell them it is probably the real drug, to keep them motivated',q:-6,why:'Guessing aloud can bias the participant’s reports and still undermines the blind.'}]},
+ {id:'causal',when:()=>S.saes.length>0&&S.day>=2,title:'Probably unrelated',
+  text:'A vaccinated participant was hospitalized after a fall on ice. The team agrees it is almost certainly unrelated to the vaccine and suggests skipping the SAE report.',
+  opts:[{t:'Skip the report; it is clearly unrelated',q:-12,why:'All SAEs are reported, related or not. The investigator records a causality assessment, but that does not replace reporting.'},
+        {t:'Report within 24 hours and give the investigator’s causality assessment',q:+2,ok:1,why:'Correct. Hospitalization makes it serious. Report promptly and include the investigator’s opinion on causality.'},
+        {t:'Wait until the hospital records arrive, then decide',q:-6,why:'Report with what you know now and send follow-up information later. Waiting risks missing the 24-hour timeline.'}]},
+ {id:'consentdate',when:()=>S.day>=6&&S.t>15,title:'Monitor finding: undated consent',
+  text:'The monitor finds a consent form that the participant signed but did not date. The participant is coming in today.',
+  opts:[{t:'Write in the original date yourself',q:-14,why:'Writing a date on someone else’s behalf is falsifying a record.'},
+        {t:'Document the error in a note to file, and follow sponsor and ethics committee guidance, which may mean re-consenting with the correct date today',q:+2,ok:1,why:'Correct. Never backdate. Explain what happened in a dated note to file and fix it the way the sponsor and ethics committee require.'},
+        {t:'Ignore it; the signature is there',q:-5,why:'Consent documentation must be complete. An open finding will escalate at the next visit.'}]},
+];
+function checkPops(){
+  if(S.mode!=='play'||S.clock-S.lastPop<22)return;
+  for(const c of CALLS){if(S.calls[c.id])continue;if(c.when()){S.calls[c.id]={pick:null};S.lastPop=S.clock;openPop('call',c.id,true);return;}}
+  for(const l of BOOK){if(S.learn[l.id])continue;if(l.when()){S.learn[l.id]={quiz:null};S.lastPop=S.clock;openPop('book',l.id,true);return;}}
+}
+function openPop(kind,id,fresh){S.pop={kind,id,fresh,from:S.mode};S.mode='pop';showModal();}
+function closePop(){S.mode=S.pop.from||'play';S.pop=null;if(S.mode==='play')$('#modal').hidden=true;else showModal();renderPanels();}
+function popHTML(){
+  const{kind,id,fresh}=S.pop;
+  if(kind==='book'){const l=BOOK.find(b=>b.id===id),st=S.learn[id]||{};
+    return '<div class="h">'+(fresh?'New playbook entry · '+Object.keys(S.learn).length+' of '+BOOK.length:'Site playbook')+'</div><h2>'+l.name+'</h2><p>'+l.def+'</p><div class="formula">'+l.formula+'</div>'+
+      '<div class="livebox"><div class="h">At Site 104 right now</div><p>'+l.live()+'</p></div><p><b>Try this:</b> '+l.tryit+'</p>'+
+      '<div class="quiz"><div class="h">Check your understanding'+(st.quiz?'':' <em>+$300 if correct</em>')+'</div><p>'+l.q+'</p><div class="opts">'+
+      l.opts.map((o,i)=>'<button class="opt'+(st.quiz?(i===l.a?' right':st.pick===i?' wrong':''):'')+'" data-opt="'+i+'" '+(st.quiz?'disabled':'')+'>'+o+'</button>').join('')+'</div>'+
+      (st.quiz?'<p><b>'+(st.quiz==='right'?'Correct.':'Not quite.')+'</b> '+l.why+'</p>':'')+'</div><button class="cta" id="back">Back to the clinic</button>';}
+  const c=CALLS.find(c=>c.id===id),st=S.calls[id]||{};
+  const ok=c.opts.findIndex(o=>o.ok);
+  return '<div class="h">Judgment call · GCP</div><h2>'+c.title+'</h2><div class="scenario">'+c.text+'</div><div class="opts">'+
+    c.opts.map((o,i)=>'<button class="opt'+(st.pick!=null?(i===ok?' right':st.pick===i?' wrong':''):'')+'" data-call="'+i+'" '+(st.pick!=null?'disabled':'')+'>'+o.t+'</button>').join('')+'</div>'+
+    (st.pick!=null?'<p><b>'+(c.opts[st.pick].ok?'Good call.':'That would be a problem.')+'</b> '+c.opts[st.pick].why+(c.opts[st.pick].ok?'':' <br><b>Better:</b> '+c.opts[ok].t+'.')+'</p><p class="empty">Quality '+(c.opts[st.pick].q>0?'+':'')+c.opts[st.pick].q+'</p><button class="cta" id="back">Back to the clinic</button>':'<p class="empty">Choose what the site should do.</p>');
+}
+
+/* ---------- rendering ---------- */
+const cv=$('#cv'),g=cv.getContext('2d');
+let VW=0,VH=0,DPR=1,TW=40,TH=20,ZU=16,OX=0,OY=0,hover=null,hoverWhy=null;
+function resize(){
+  const r=cv.parentElement.getBoundingClientRect();DPR=Math.min(2,window.devicePixelRatio||1);VW=r.width;VH=r.height;
+  cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR);
+  const minSx=(-1.5-H)/2,maxSx=(W+.5)/2,minSy=-.9,maxSy=(W+H)/4+.15;
+  TW=Math.min(VW*.96/(maxSx-minSx),VH*.93/(maxSy-minSy));TH=TW/2;ZU=TW*.42;
+  OX=VW/2-(minSx+maxSx)/2*TW;OY=VH/2-(minSy+maxSy)/2*TW;
+}
+const P=(x,y,z=0)=>[OX+(x-y)*TW/2,OY+(x+y)*TH/2-z*ZU];
+function poly(pts,fill,stroke){g.beginPath();g.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)g.lineTo(pts[i][0],pts[i][1]);g.closePath();if(fill){g.fillStyle=fill;g.fill();}if(stroke){g.strokeStyle=stroke;g.stroke();}}
+function shade(hex,f){const n=parseInt(hex.slice(1),16);let r=n>>16,gg=n>>8&255,b=n&255;const m=c=>Math.round(f<0?c*(1+f):c+(255-c)*f);return 'rgb('+m(r)+','+m(gg)+','+m(b)+')';}
+function box(x,y,z,dx,dy,dz,col,alpha){
+  if(alpha!==undefined)g.globalAlpha=alpha;
+  poly([P(x,y+dy,z),P(x+dx,y+dy,z),P(x+dx,y+dy,z+dz),P(x,y+dy,z+dz)],shade(col,-.22));
+  poly([P(x+dx,y,z),P(x+dx,y+dy,z),P(x+dx,y+dy,z+dz),P(x+dx,y,z+dz)],shade(col,-.1));
+  poly([P(x,y,z+dz),P(x+dx,y,z+dz),P(x+dx,y+dy,z+dz),P(x,y+dy,z+dz)],col);
+  g.globalAlpha=1;
+}
+function tile(x,y,c,s){poly([P(x,y),P(x+1,y),P(x+1,y+1),P(x,y+1)],c,s);}
+function drawFloor(){
+  g.fillStyle='#dfe6e3';g.fillRect(0,0,VW,VH);
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    const z=zone(x,y);
+    let c=z==='wait'?((x+y)%2?'#c9d6cf':'#c3d1c9'):z==='office'?((x+y)%2?'#d9c6a8':'#d3bf9f'):z==='recv'?'#cfd9d4':z==='door'?'#a7b6b0':((x+y)%2?'#f3f6f5':'#eaf0ee');
+    tile(x,y,c,'rgba(120,140,135,.25)');
+  }
+  // back walls
+  box(0,-.12,0,W,.12,.7,'#b9c7c2');
+  for(let y=0;y<H;y++){if(y===ENTRY[1])continue;box(-.12,y,0,.12,1,.7,'#b9c7c2');}
+  box(-.12,ENTRY[1],.62,.12,1,.08,'#b9c7c2');
+  // reception desk + chairs + office desks
+  box(1.15,5.2,0,2.6,.5,.42,'#7d9a92');box(1.15,5.2,.42,2.6,.5,.04,'#e9eeec');
+  for(const[x,y]of WAIT_SPOTS){box(x+.25,y+.62,0,.5,.28,.22,'#6f8d86');box(x+.25,y+.82,.22,.5,.08,.3,'#6f8d86');}
+  for(const[x,y]of DESKS){box(x+.1,y+.12,0,.8,.45,.38,'#b28a5c');box(x+.32,y+.2,.38,.36,.06,.24,'#2b3a38');}
+  const[lx,ly]=P(2.2,10.45);g.fillStyle='#5d716d';g.font='600 '+Math.max(9,TW*.2)+'px "IBM Plex Mono",monospace';g.textAlign='center';g.fillText('WAITING',lx,ly);
+  const[ox,oy]=P(12,1.85);g.fillText('OFFICE',ox,oy);
+}
+function drawStation(s){
+  const x=s.x,y=s.y,sel=S.sel&&S.sel.k==='S'&&S.sel.id===s.id;
+  tile(x,y,s.k==='bed'?'#c9d2e6':s.k==='eeg'?'#ddd3ee':s.k==='vax'?'#f2e6c6':'#e1eae7',sel?'#0e6b66':'rgba(120,140,135,.5)');
+  switch(s.k){
+    case 'consent':box(x+.2,y+.3,0,.6,.4,.36,'#b48c5f');box(x+.1,y+.75,0,.28,.2,.22,'#3f5f7f');box(x+.62,y+.75,0,.28,.2,.22,'#3f5f7f');break;
+    case 'exam':box(x+.15,y+.25,0,.7,.4,.34,'#d7dedc');box(x+.15,y+.25,.34,.7,.4,.05,'#1c8c84');box(x+.82,y+.05,0,.06,.9,.9,'#bcd8d4',.6);break;
+    case 'vax':box(x+.08,y+.08,0,.36,.36,.85,'#f4f6f6');box(x+.1,y+.2,.45,.02,.2,.25,'#2c68cc');box(x+.55,y+.5,0,.32,.32,.24,'#d39a12');break;
+    case 'obs':box(x+.22,y+.3,0,.56,.45,.22,'#1c8c84');box(x+.22,y+.3,.22,.56,.12,.36,'#1c8c84');break;
+    case 'lab':box(x+.08,y+.2,0,.84,.55,.4,'#c8d2cf');box(x+.18,y+.3,.4,.24,.24,.14,'#f4f6f6');box(x+.6,y+.32,.4,.06,.06,.18,'#7357c4');box(x+.7,y+.32,.4,.06,.06,.18,'#d39a12');break;
+    case 'eeg':box(x+.2,y+.3,0,.5,.45,.3,'#7357c4');box(x+.2,y+.3,.3,.5,.1,.4,'#7357c4');box(x+.72,y+.1,0,.2,.2,.6,'#2b3a38');break;
+    case 'bed':box(x+.1,y+.12,0,.8,.76,.28,'#2c68cc');box(x+.12,y+.14,.28,.76,.72,.05,'#f4f6f6');box(x+.62,y+.2,.33,.24,.6,.06,'#dfe6f5');box(x+.04,y+.04,0,.12,.12,.7,'#2b3a38');break;
+  }
+  const p=s.busy&&s.busy!=='lab'&&patient(s.busy);
+  if(p&&p.state==='inStep'){const st=stepOf(p);const fr=1-p.timer/st[2];const[a,b]=P(x+.5,y+.5,1.25);g.fillStyle='rgba(22,48,45,.85)';g.fillRect(a-TW*.3,b,TW*.6,4);g.fillStyle='#2f8a4e';g.fillRect(a-TW*.3,b,TW*.6*clamp(fr,0,1),4);}
+}
+function drawPerson(x,y,body,head,ring,mark){
+  const cx=x+.5,cy=y+.5;
+  if(ring){const[a,b]=P(cx,cy);g.strokeStyle=ring;g.lineWidth=2;g.beginPath();g.ellipse(a,b,TW*.2,TH*.2,0,0,Math.PI*2);g.stroke();g.lineWidth=1;}
+  box(cx-.1,cy-.1,0,.2,.2,.62,body);
+  const[a,b]=P(cx,cy,.8);g.fillStyle=head;g.beginPath();g.arc(a,b,TW*.075,0,Math.PI*2);g.fill();
+  if(mark){const[m,n]=P(cx,cy,1.25);g.fillStyle=mark;g.beginPath();g.arc(m,n,TW*.09,0,Math.PI*2);g.fill();g.fillStyle='#fff';g.font='700 '+Math.max(9,TW*.13)+'px "IBM Plex Mono",monospace';g.textAlign='center';g.textBaseline='middle';g.fillText('!',m,n+1);}
+}
+function render(){
+  g.setTransform(DPR,0,0,DPR,0,0);
+  drawFloor();
+  const items=[];
+  for(const s of S.stations)items.push({d:s.x+s.y+.9,f:()=>drawStation(s)});
+  for(const p of S.patients){const sb=subject(p.subj);const sel=S.sel&&S.sel.k==='P'&&S.sel.id===p.id;
+    items.push({d:p.x+p.y+1.1,f:()=>drawPerson(p.state==='inStep'?p.x-.12:p.x,p.state==='inStep'?p.y+.08:p.y,STUDY[sb.study].color,'#c99a78',sel?'#0e6b66':null,p.state==='idle'&&p.wait>40?'#c23a3a':null)});}
+  for(const sf of S.staff){const sel=S.sel&&S.sel.k==='F'&&S.sel.id===sf.id;
+    items.push({d:sf.x+sf.y+1.05,f:()=>drawPerson(sf.x,sf.y,ROLE[sf.role].color,'#8a6248',sel?'#0e6b66':null,null)});}
+  if(hover&&ST[S.tool])items.push({d:hover[0]+hover[1]+1.2,f:()=>box(hover[0]+.1,hover[1]+.1,0,.8,.8,.4,hoverWhy?'#c23a3a':'#0e6b66',.35)});
+  items.sort((a,b)=>a.d-b.d).forEach(i=>i.f());
+  if(hover){g.lineWidth=1.5;tile(hover[0],hover[1],null,S.tool==='remove'?'#c23a3a':'#0e6b66');g.lineWidth=1;}
+  g.textAlign='center';g.textBaseline='middle';
+  for(const f of S.fx){const[a,b]=P(f.x+.5,f.y+.5,1.5+f.age*.8);g.globalAlpha=clamp(1.6-f.age,0,1);g.fillStyle=f.col;g.font='600 '+Math.max(11,TW*.24)+'px "IBM Plex Mono",monospace';g.fillText(f.txt,a,b);g.globalAlpha=1;}
+}
+
+/* ---------- input ---------- */
+function pick(e){const r=cv.getBoundingClientRect(),mx=e.clientX-r.left-OX,my=e.clientY-r.top-OY;const a=mx/(TW/2),b=my/(TH/2);return [Math.floor((a+b)/2),Math.floor((b-a)/2),(a+b)/2,(b-a)/2];}
+cv.addEventListener('pointermove',e=>{const[x,y]=pick(e);if(x<0||y<0||x>=W||y>=H){hover=null;return;}if(!hover||hover[0]!==x||hover[1]!==y){hover=[x,y];hoverWhy=ST[S.tool]?canBuild(x,y):null;}});
+cv.addEventListener('pointerleave',()=>hover=null);
+cv.addEventListener('contextmenu',e=>{e.preventDefault();setTool('select');});
+cv.addEventListener('pointerdown',e=>{
+  if(e.button===2||S.mode!=='play')return;
+  const[x,y,fx_,fy]=pick(e);
+  if(ST[S.tool]){build(x,y,S.tool);hoverWhy=canBuild(x,y);renderPanels();return;}
+  if(S.tool==='remove'){removeAt(x,y);renderPanels();return;}
+  let best=null,bd=.5;
+  for(const p of S.patients){const d=Math.hypot(p.x+.5-fx_,p.y+.5-fy);if(d<bd){bd=d;best={k:'P',id:p.id};}}
+  for(const s of S.staff){const d=Math.hypot(s.x+.5-fx_,s.y+.5-fy);if(d<bd){bd=d;best={k:'F',id:s.id};}}
+  if(!best){const s=S.stations.find(s=>s.x===x&&s.y===y);if(s)best={k:'S',id:s.id};}
+  S.sel=best;renderInspector();
+});
+function setTool(t){S.tool=t;renderLeft();if(hover)hoverWhy=ST[t]?canBuild(hover[0],hover[1]):null;}
+$('#tools').addEventListener('click',e=>{const b=e.target.closest('[data-tool]');if(b)setTool(b.dataset.tool);});
+$('#staff').addEventListener('click',e=>{const b=e.target.closest('[data-hire],[data-fire]');if(!b||S.mode!=='play')return;b.dataset.hire?hire(b.dataset.hire):letGo(b.dataset.fire);renderPanels();});
+$('#ads').addEventListener('click',e=>{const b=e.target.closest('[data-ad]');if(!b||S.mode==='over')return;const[k,d]=b.dataset.ad.split(':');S.ads[k]=clamp(S.ads[k]+ +d,0,2);renderLeft();});
+$('#ip').addEventListener('click',e=>{if(e.target.closest('#order')&&!S.shipment&&S.mode!=='over'){S.shipment=1;S.cash-=250;toast('Resupply ordered: 20 doses arrive tomorrow morning ($250 courier).');renderLeft();}});
+document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{S.focus=b.dataset.focus;renderLeft();}));
+document.querySelectorAll('.speed button').forEach(b=>b.addEventListener('click',()=>{if(S.mode!=='play')return;S.speed=+b.dataset.speed;renderTop();}));
+document.querySelector('.tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b){S.tab=b.dataset.tab;renderRight();}});
+const rightAct=e=>{const b=e.target.closest('[data-book]');if(b&&!b.disabled&&S.mode!=='pop')openPop('book',b.dataset.book,false);};
+$('.right').addEventListener('pointerdown',e=>{if(e.button===0)rightAct(e);});
+$('.right').addEventListener('click',e=>{if(e.detail===0)rightAct(e);});
+let lastSpeed=1;
+window.addEventListener('keydown',e=>{const k=e.key.toLowerCase();
+  if(k===' '){e.preventDefault();if(S.mode!=='play')return;if(S.speed){lastSpeed=S.speed;S.speed=0;}else S.speed=lastSpeed||1;renderTop();}
+  else if(k==='escape')setTool('select');});
+
+/* ---------- panels ---------- */
+let toastT=0;
+function renderTop(){
+  $('#kDay').textContent='Day '+S.day+' / '+DAYS+' · '+clock(S.t);
+  const c=$('#kCash');c.textContent=money(S.cash);c.style.color=S.cash<0?'var(--bad)':'';
+  $('#kQ').textContent=Math.round(S.quality);const qb=$('#kQBar');qb.style.width=S.quality+'%';qb.style.background=S.quality>75?'var(--good)':S.quality>55?'var(--warn)':'var(--bad)';
+  $('#kS').textContent=Math.round(S.sat);const sb=$('#kSBar');sb.style.width=S.sat+'%';sb.style.background=S.sat>65?'var(--good)':S.sat>40?'var(--warn)':'var(--bad)';
+  setHTML($('#kEnr'),Object.keys(STUDY).map(k=>'<span title="'+STUDY[k].code+'"><i class="dot" style="background:'+STUDY[k].color+'"></i>'+S.tot.enrolled[k]+'/'+STUDY[k].target+'</span>').join(''));
+  document.querySelectorAll('.speed button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.speed===S.speed));
+}
+function renderLeft(){
+  const tl=[['select','Inspect','click to view'],['remove','Remove','50% refund']].concat(Object.keys(ST).map(k=>[k,ST[k].name,money(ST[k].cost)]));
+  setHTML($('#tools'),tl.map(([k,n,s])=>'<button class="tool" data-tool="'+k+'" aria-pressed="'+(S.tool===k)+'"><b>'+n+'</b><small>'+s+'</small></button>').join(''));
+  setHTML($('#staff'),Object.keys(ROLE).map(r=>{const n=S.staff.filter(s=>s.role===r).length;return '<div class="srow"><i class="dot" style="background:'+ROLE[r].color+';box-shadow:0 0 0 1px #9aa9a5"></i><span>'+ROLE[r].name+' <small>'+money(ROLE[r].pay)+'/day</small></span><b style="font-family:var(--mono)">'+n+'</b><span><button class="mini" data-fire="'+r+'" aria-label="Let go one '+ROLE[r].name+'">−</button> <button class="mini" data-hire="'+r+'" aria-label="Hire '+ROLE[r].name+'" '+(n>=ROLE[r].max?'disabled':'')+'>+</button></span></div>';}).join(''));
+  $('#payroll').textContent=money(S.staff.reduce((a,s)=>a+ROLE[s.role].pay,0))+'/day';
+  document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.focus===S.focus));
+  setHTML($('#ads'),Object.keys(STUDY).map(k=>{const on=STUDY[k].unlock<=S.day+1,lv=S.ads[k];return '<div class="srow"><i class="dot" style="background:'+STUDY[k].color+'"></i><span>'+STUDY[k].code+' <small>'+(k==='RSV'&&S.day>STUDY.RSV.closeDay?'closed':STUDY[k].ads[lv]+'/day')+'</small></span><b style="font-family:var(--mono)">'+lv+'</b><span><button class="mini" data-ad="'+k+':-1" '+(lv?'':'disabled')+' aria-label="Lower ads">−</button> <button class="mini" data-ad="'+k+':1" '+(lv<2&&on?'':'disabled')+' aria-label="Raise ads">+</button></span></div>';}).join(''));
+  setHTML($('#ip'),'<b>RSV vaccine: '+S.doses+' doses</b>'+(S.quarantine>0?' <span class="tag bad">quarantined</span>':'')+'<br><span class="empty">Stored at 2–8 °C in the vaccine bay fridge.</span><br><button class="btn" id="order" style="margin-top:6px" '+(S.shipment?'disabled':'')+'><b>'+(S.shipment?'Shipment arriving tomorrow':'Order 20 doses')+'</b><small>$250 courier · arrives next morning</small></button>');
+}
+const stepName=p=>{const st=stepOf(p);return st?st[3]:'';};
+function renderRight(){
+  document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===S.tab));
+  for(const[t,id]of[['today','#paneToday'],['tasks','#paneTasks'],['studies','#paneStudies'],['book','#paneBook']])$(id).hidden=S.tab!==t;
+  const nT=S.samples.length+S.crfs.length+S.saes.length;$('#taskCount').textContent=nT?'('+nT+')':'';
+  $('#bookCount').textContent=Object.keys(S.learn).length+'/'+BOOK.length;
+  if(S.tab==='today'){
+    const inC=S.patients.filter(p=>p.state!=='leave');
+    const upc=(S.arrivals||[]).slice(0,8);
+    setHTML($('#paneToday'),'<div class="sec"><div class="h">In clinic <em>'+inC.length+'</em></div><div class="list">'+
+      (inC.length?inC.sort((a,b)=>b.wait-a.wait).map(p=>{const sb=subject(p.subj),v=VISIT[p.visit],w=Math.round(p.wait);
+        const st=p.state==='idle'?(w>40?'bad':w>20?'warn':''):'good';
+        return '<div class="card" style="border-left-color:'+STUDY[sb.study].color+'"><div class="r1"><b>'+sb.code+'</b><span class="tag '+st+'">'+(p.state==='idle'?'waiting '+w+'s':p.state==='enter'?'arriving':'in progress')+'</span></div><div class="r2">'+v.label+' · step '+(p.step+1)+'/'+v.steps.length+': '+stepName(p)+'</div></div>';}).join(''):'<div class="empty">No patients in the clinic.</div>')+
+      '</div></div><div class="sec"><div class="h">Arriving next <em>'+(S.arrivals||[]).length+' left today</em></div><div class="list">'+
+      (upc.length?upc.map(a=>{const sb=a.subj&&subject(a.subj),k=sb?sb.study:a.study;return '<div class="card" style="border-left-color:'+STUDY[k].color+'"><div class="r1"><b>'+(sb?sb.code:'New referral')+'</b><span>'+clock(a.at)+'</span></div><div class="r2">'+STUDY[k].code+' · '+VISIT[a.visit].label+'</div></div>';}).join(''):'<div class="empty">No more arrivals today.</div>')+'</div></div>');
+  }
+  if(S.tab==='tasks'){
+    const row=(code,label,due,tagTxt)=>{const left=due-S.clock,cls=left<0?'bad':left<15?'warn':'';return '<div class="card"><div class="r1"><b>'+code+'</b><span class="tag '+cls+'">'+(left<0?'overdue':tagTxt(left))+'</span></div><div class="r2">'+label+'</div></div>';};
+    setHTML($('#paneTasks'),
+      '<div class="sec"><div class="h">SAE reports <em>investigator · 24 h</em></div><div class="list">'+(S.saes.length?S.saes.map(s=>row(s.code,'Hospitalization reported; assess and notify sponsor',s.due,l=>Math.ceil(l/55*24)+' h left')).join(''):'<div class="empty">None open.</div>')+'</div></div>'+
+      '<div class="sec"><div class="h">Lab samples <em>process within window</em></div><div class="list">'+(S.samples.length?S.samples.map(s=>row(s.code,s.taken?'Centrifuging':'Waiting for a lab bench',s.due,l=>Math.ceil(l*3.6)+' min left')).join(''):'<div class="empty">None waiting.</div>')+'</div></div>'+
+      '<div class="sec"><div class="h">Data entry (CRFs) <em>'+S.crfs.length+' open</em></div><div class="list">'+(S.crfs.length?S.crfs.slice().sort((a,b)=>a.due-b.due).slice(0,12).map(c=>row(c.code,c.visit+(c.taken?' · being entered':''),c.due,l=>'due in '+Math.ceil(l/DAY_LEN*24)+' h')).join(''):'<div class="empty">All caught up.</div>')+'</div></div>');
+  }
+  if(S.tab==='studies'){
+    setHTML($('#paneStudies'),Object.keys(STUDY).map(k=>{const s=STUDY[k],on=s.unlock<=S.day,sc=S.tot.screened[k],fl=S.tot.failed[k],en=S.tot.enrolled[k];
+      const up=S.appts.filter(a=>!a.done&&subject(a.subj).study===k).length;
+      return '<div class="study" style="border-left:4px solid '+s.color+'"><div class="t"><b>'+s.code+'</b><span class="tag">'+(!on?'opens day '+s.unlock:k==='RSV'&&S.day>s.closeDay?'enrollment closed':'enrolling')+'</span></div><p>'+s.name+(k==='RSV'?' · global enrollment closes after day '+s.closeDay:'')+'</p>'+
+        '<div class="bar"><i style="width:'+Math.min(100,en/s.target*100)+'%;background:'+s.color+'"></i></div>'+
+        '<div class="funnel"><span>Screened</span><span>'+sc+'</span><span>Screen failures</span><span>'+fl+(sc?' ('+pct(fl/sc)+')':'')+'</span><span>'+(k==='RSV'?'Vaccinated':'Randomized')+'</span><span>'+en+' / '+s.target+'</span><span>Upcoming visits</span><span>'+up+'</span>'+(k==='OSA'?'<span>Waiting for PSG bed</span><span>'+S.psg.length+'</span>':'')+'</div></div>';}).join('')+
+      '<div class="sec"><div class="h">Protocol deviations <em>'+S.devs.length+'</em></div><div class="list">'+(S.devs.length?S.devs.slice(-6).reverse().map(d=>'<div class="card" style="border-left-color:var(--'+(d.sev==='major'?'bad':'warn')+')"><div class="r1"><b>Day '+d.day+'</b><span class="tag '+(d.sev==='major'?'bad':'warn')+'">'+d.sev+'</span></div><div class="r2">'+d.text+'</div></div>').join(''):'<div class="empty">None so far.</div>')+'</div></div>');
+  }
+  if(S.tab==='book'){
+    setHTML($('#paneBook'),'<p class="empty" style="margin:0">Entries unlock as your site runs into each topic. Each has a question worth $300. Judgment calls made: '+Object.values(S.calls).filter(c=>c.pick!=null).length+'/'+CALLS.length+'.</p><div class="man">'+
+      BOOK.map(l=>{const st=S.learn[l.id];return '<button data-book="'+l.id+'" '+(st?'':'disabled')+'><b>'+l.name+(st&&st.quiz==='right'?' <span class="done">✓</span>':'')+'</b><small>'+(st?l.formula:l.hint)+'</small></button>';}).join('')+'</div>');
+  }
+}
+function renderInspector(){
+  const el=$('#insp');if(!S.sel){el.innerHTML='Click a person or a room on the floor.';return;}
+  if(S.sel.k==='P'){const p=patient(S.sel.id);if(!p){S.sel=null;return renderInspector();}const sb=subject(p.subj),v=VISIT[p.visit];
+    el.innerHTML='<b>'+sb.code+'</b><br>'+STUDY[sb.study].code+' · '+v.label+'<br>Step '+(p.step+1)+' of '+v.steps.length+': '+stepName(p)+'<br>'+(p.state==='idle'?'Waiting '+Math.round(p.wait)+' s for '+ST[stepOf(p)[0]].name.toLowerCase()+(stepOf(p)[1]?' and a '+ROLE[stepOf(p)[1]].name.toLowerCase():''):p.state==='inStep'?'In progress':'Walking');}
+  else if(S.sel.k==='F'){const f=staffBy(S.sel.id);if(!f){S.sel=null;return renderInspector();}
+    const t=f.task;let what='Available.';if(t){if(t.k==='step'){const p=patient(t.pid);what=p?stepName(p)+' with '+subject(p.subj).code+'.':'Finishing up.';}else what=t.k==='lab'?'Processing a lab sample.':t.k==='crf'?'Entering CRF data.':'Filing an SAE report.';}
+    el.innerHTML='<b>'+ROLE[f.role].name+' '+f.n+'</b><br>'+what+'<br><span class="empty">Busy '+pct(f.util)+' of recent time.</span>';}
+  else{const s=station(S.sel.id);if(!s){S.sel=null;return renderInspector();}const p=s.busy&&s.busy!=='lab'&&patient(s.busy);
+    el.innerHTML='<b>'+ST[s.k].name+'</b><br>'+(p?'In use: '+stepName(p)+' ('+subject(p.subj).code+')':s.busy==='lab'?'Processing a sample':'Free')+'<br><span class="empty">'+({consent:'Coordinators run consent and diary reviews here.',exam:'Nurses and investigators see patients here.',vax:'Nurses vaccinate here. Holds the 2–8 °C fridge.',obs:'Patients rest here after a dose. No staff needed.',lab:'Nurses or coordinators centrifuge samples here.',eeg:'Techs record routine EEGs here.',bed:'Runs one overnight sleep study per night, if a tech is on staff.'})[s.k]+'</span>';}
+}
+function renderPanels(){renderTop();renderLeft();renderRight();renderInspector();}
+
+function showModal(){
+  const m=$('#modal'),sh=$('#sheet');m.hidden=false;
+  if(S.mode==='brief'){
+    sh.innerHTML='<div class="h">Site initiation · Day 1</div><h2>Run a clinical research site</h2>'+
+      '<p>You manage Site 104, a research clinic running three sponsor trials. Patients arrive for visits. Your coordinators, nurses, investigator and techs move them through each protocol step, in the right rooms, in the right order.</p>'+
+      '<ul><li><b style="color:#b07d00">RSV-OA-301</b> opens today: vaccine screening, dose and observation. Target 50 vaccinated before global enrollment closes after day 8.</li>'+
+      '<li><b style="color:#7357c4">EPI-217</b> opens day 2. Target 6 randomized. Screening needs an EEG station and a tech.</li>'+
+      '<li><b style="color:#2c68cc">OSA-140</b> opens day 3. Target 5 randomized. Screening ends with an overnight sleep study, so you need sleep lab beds and a tech.</li>'+
+      '<li>Process blood samples before their window closes, enter visit data within a day and report SAEs within 24 hours. Deviations lower your quality score. At 40 the sponsor suspends your site.</li>'+
+      '<li>Long waits hurt patient experience, and unhappy patients skip visits.</li></ul>'+
+      '<p>Your <b>Site Playbook</b> fills with Good Clinical Practice lessons as they come up, and <b>judgment calls</b> will test what you would do. Run 10 clinic days and hit your enrollment targets.'+(best()?' Best score so far: '+best().toLocaleString('en-US')+'.':'')+'</p>'+
+      '<button class="cta" id="go">Open the clinic</button>';
+  }else if(S.mode==='pop'){sh.innerHTML=popHTML();}
+  else if(S.mode==='summary'||S.mode==='won'){
+    const s=S.summary,net=s.rev-s.payroll-s.ads-s.rent,next=S.day+1;
+    const note=next===2?'<p><b style="color:#7357c4">EPI-217 opens tomorrow.</b> Build an EEG station and hire a neuro/sleep tech.</p>':next===3?'<p><b style="color:#2c68cc">OSA-140 opens tomorrow.</b> Build sleep lab beds; they run overnight with a tech on staff.</p>':next===STUDY.RSV.closeDay+1?'<p>RSV global enrollment has closed. Remaining RSV visits are follow-ups.</p>':'';
+    sh.innerHTML='<div class="h">'+(S.mode==='won'?'Study period complete':'End of clinic day '+s.day)+'</div><h2>'+(S.mode==='won'?'Site 104 closes out 10 days':'Day '+s.day+' closed')+'</h2>'+
+      '<div class="ledger"><span>Visits completed</span><span>'+s.visits+'</span><span>Walkouts</span><span>'+s.walkouts+'</span>'+
+      '<span>Sponsor payments</span><span class="pos">'+money(s.rev)+'</span><span>Payroll</span><span class="neg">'+money(-s.payroll)+'</span><span>Rent and utilities</span><span class="neg">'+money(-s.rent)+'</span>'+(s.ads?'<span>Recruitment ads</span><span class="neg">'+money(-s.ads)+'</span>':'')+
+      '<span class="tot">Net for the day</span><span class="tot '+(net<0?'neg':'pos')+'">'+money(net)+'</span><span>Cash</span><span>'+money(S.cash)+'</span>'+
+      '<span>Quality</span><span>'+Math.round(S.quality)+'</span><span>Deviations today</span><span>'+s.devs.length+'</span><span>Overdue CRFs</span><span>'+s.overdue+'</span></div>'+
+      (s.night.length||s.gaveUp.length||S.psg.length?'<div class="livebox"><div class="h">Overnight sleep lab</div><p>'+s.night.map(n=>n.code+': AHI '+n.ahi+(n.ok?' → eligible, randomization booked':' → screen failure')).join('<br>')+(S.psg.length?(s.night.length?'<br>':'')+S.psg.length+' still waiting for a bed.':'')+(s.gaveUp.length?'<br><b>Withdrew after waiting 3 nights:</b> '+s.gaveUp.join(', '):'')+'</p></div>':'')+
+      (s.monitor?'<div class="livebox"><div class="h">Monitoring visit report</div><p>The sponsor’s monitor reviewed source documents. Open CRFs: <b>'+s.monitor.open+'</b> ('+s.monitor.overdue+' overdue). Deviations since the last visit: <b>'+s.monitor.recent+'</b> ('+s.monitor.major+' major). Quality '+(s.monitor.penalty?'−'+s.monitor.penalty:'unchanged')+'.</p></div>':'')+
+      (S.mode==='won'?'<div class="livebox"><div class="h">Sponsor site rating</div><p><b style="font-family:var(--display);font-size:28px">'+grade()[0]+'</b> '+grade()[1]+'</p></div><p>Enrollment: RSV '+S.tot.enrolled.RSV+'/'+STUDY.RSV.target+' · EPI '+S.tot.enrolled.EPI+'/'+STUDY.EPI.target+' · OSA '+S.tot.enrolled.OSA+'/'+STUDY.OSA.target+'. Final score <b>'+score().toLocaleString('en-US')+'</b>.</p><button class="cta" id="again">Run the site again</button>'
+        :note+'<button class="cta" id="go">Open day '+next+'</button>');
+    if(S.mode==='won')saveBest();
+  }else if(S.mode==='over'){
+    sh.innerHTML='<div class="h">Site closed · day '+S.day+'</div><h2>Enrollment suspended</h2><p>'+S.why+'</p><div class="ledger"><span>Visits completed</span><span>'+S.tot.visits+'</span><span>Enrolled</span><span>RSV '+S.tot.enrolled.RSV+' · EPI '+S.tot.enrolled.EPI+' · OSA '+S.tot.enrolled.OSA+'</span><span>Deviations</span><span>'+S.devs.length+'</span><span>Score</span><span>'+score().toLocaleString('en-US')+'</span></div><button class="cta" id="again">Try again</button>';
+  }
+  const back=$('#back');if(back){back.onclick=closePop;back.focus();}
+  sh.querySelectorAll('[data-opt]').forEach(b=>b.onclick=()=>{const l=BOOK.find(x=>x.id===S.pop.id),st=S.learn[l.id],i=+b.dataset.opt;if(!st||st.quiz)return;st.pick=i;st.quiz=i===l.a?'right':'wrong';if(st.quiz==='right')S.cash+=300;showModal();renderPanels();});
+  sh.querySelectorAll('[data-call]').forEach(b=>b.onclick=()=>{const c=CALLS.find(x=>x.id===S.pop.id),st=S.calls[c.id],i=+b.dataset.call;if(st.pick!=null)return;st.pick=i;const o=c.opts[i];
+    S.quality=clamp(S.quality+o.q,0,100);if(o.cash)S.cash+=o.cash;if(o.quar)S.quarantine=o.quar;if(o.wipe){S.doses=0;S.shipment=1;}
+    if(!o.ok)S.devs.push({day:S.day,sev:o.q<=-10?'major':'minor',text:c.title+': '+o.t.toLowerCase()});showModal();renderPanels();});
+  const go=$('#go'),again=$('#again');
+  if(go){go.onclick=()=>{if(S.mode==='summary'){S.day++;S.t=0;S.day0=JSON.parse(JSON.stringify(S.tot));if(S.shipment){S.doses+=20;S.shipment=0;}planDay();}
+    S.mode='play';if(!S.speed)S.speed=1;m.hidden=true;renderPanels();};go.focus();}
+  if(again){again.onclick=()=>{newGame();showModal();renderPanels();};again.focus();}
+}
+
+/* ---------- loop ---------- */
+let last=performance.now(),uiT=0,popT=1;
+function frame(now){
+  const real=Math.min(.1,(now-last)/1000);last=now;
+  if(S.mode==='play'&&S.speed){let dt=real*S.speed;while(dt>0&&S.mode==='play'){const h=Math.min(.05,dt);step(h);dt-=h;}}
+  if(toastT>0){toastT-=real;if(toastT<=0)$('#toast').style.opacity=0;}
+  uiT-=real;if(uiT<=0){uiT=.25;renderPanels();popT-=.25;if(popT<=0){popT=1;checkPops();}}
+  render();requestAnimationFrame(frame);
+}
+function boot(data){
+  if(data&&data.S){S=data.S;}else newGame();
+  resize();renderPanels();if(S.mode!=='play')showModal();
+  requestAnimationFrame(frame);
+}
+new ResizeObserver(resize).observe($('#stage'));
+try{window.claude?.hot?.snapshot?.(()=>({S:JSON.parse(JSON.stringify(S))}));}catch(e){}
+window.claude?.hot?.ready?window.claude.hot.ready(boot):boot(window.claude?.hot?.data??{});
+})();
+</script>
+
+</body>
+</html>
