@@ -1,6 +1,6 @@
 # Industrial games
 
-Two browser games in this repo, each a single self-contained page. Run `./build.sh` to regenerate each `index.html` from its `game.html` (the published artifact body).
+Three browser games in this repo, each a single self-contained page. Run `./build.sh` to regenerate each `index.html` from its `game.html` (the published artifact body).
 
 ## Crossdock Command (`index.html`)
 
@@ -27,3 +27,13 @@ Build consent rooms, exam rooms, vaccine bays, observation chairs, lab benches, 
 The **Site Playbook** teaches Good Clinical Practice as it comes up (informed consent, the screening funnel, reactogenicity, cold chain and IP accountability, sample handling, ALCOA+, serious adverse events, seizure diaries and responder rates, polysomnography and the AHI, visit windows, patient flow), each with a question worth $300. **Judgment calls** put you in realistic GCP dilemmas (consent shortcuts, temperature excursions, blank diaries, eligibility pressure, unblinding requests, SAE causality, undated consents).
 
 Study names, the site and all patients are fictional. This is an educational game, not clinical or regulatory guidance.
+
+## Diego's Export Warehouse (`export/index.html`)
+
+A night shift in an air-cargo export warehouse, laid out like Diego's floor: truck docks R1–R6 with receiving scales, the export counter, storage zones A and B with K-9 screening, three stage lanes, two PMC palletizing areas, and out doors to stands A/C 1 and A/C 2.
+
+Eleven freighters depart between 21:00 and 04:30. Every piece has to go dock → scale → counter (air waybill check) → storage → K-9 screening → stage lane → PMC build → tug → aircraft before its flight pushes back. Tap a piece, then where it goes (or tap it again for the obvious next step). Tap a palletizing area to dispatch its PMC (max 5 pieces, 4,500 kg) and tap a storage bay to send the K-9 team there first.
+
+Decide on air waybill weight mismatches (correct them or risk an audit fine), move K-9 alerts to the hold cage for secondary screening, and spend what you earn on counter agents, forklifts, K-9 teams, tug drivers and WMS automation. Pieces left behind roll to tomorrow.
+
+Flight numbers, AWBs and shippers are fictional.
