@@ -28,12 +28,17 @@ The **Site Playbook** teaches Good Clinical Practice as it comes up (informed co
 
 Study names, the site and all patients are fictional. This is an educational game, not clinical or regulatory guidance.
 
-## Diego's Export Warehouse (`export/index.html`)
+## Almacén de Exportación de Diego (`export/index.html`)
 
-A night shift in an air-cargo export warehouse, laid out like Diego's floor: truck docks R1–R6 with receiving scales, the export counter, storage zones A and B with K-9 screening, three stage lanes, two PMC palletizing areas, and out doors to stands A/C 1 and A/C 2.
+En español. Un turno nocturno en un almacén de exportación de carga aérea, con el mismo plano que el piso de Diego: andenes R1–R6 con básculas, mostrador de exportación, zonas de almacén A y B con inspección K-9, tres carriles de preparación, dos áreas de paletizado de PMC y puertas de salida a las posiciones A/C 1 y A/C 2.
 
-Eleven freighters depart between 21:00 and 04:30. Every piece has to go dock → scale → counter (air waybill check) → storage → K-9 screening → stage lane → PMC build → tug → aircraft before its flight pushes back. Tap a piece, then where it goes (or tap it again for the obvious next step). Tap a palletizing area to dispatch its PMC (max 5 pieces, 4,500 kg) and tap a storage bay to send the K-9 team there first.
+Once cargueros salen entre las 21:00 y las 04:30. Cada pieza recorre andén → báscula → mostrador (guía aérea) → almacén → inspección K-9 → carril de preparación → armado de PMC → tractor → avión antes de que su vuelo despegue.
 
-Decide on air waybill weight mismatches (correct them or risk an audit fine), move K-9 alerts to the hold cage for secondary screening, and spend what you earn on counter agents, forklifts, K-9 teams, tug drivers and WMS automation. Pieces left behind roll to tomorrow.
+- **Arrastra** cada pieza a su destino (o tócala y toca el destino; dos toques la mandan al siguiente paso). Los destinos válidos brillan en verde.
+- Toca un área de paletizado para **despachar** su PMC (máx. 5 piezas, 4,500 kg); toca una posición de almacén para mandar al K-9 ahí primero.
+- Decide en las **discrepancias de peso** de la guía y lleva las alertas K-9 a la jaula de retención.
+- **Eventos con decisiones**: carga urgente de un cliente, retrasar un vuelo, montacargas descompuesto, horas extra del K-9 y tormentas eléctricas que cierran la plataforma.
+- **Bonos** por vuelo perfecto y rachas, dinero flotante, sonidos (botón Sonido/Mudo) y ficha de información al pasar el cursor.
+- Gasta en agentes, montacargas, equipos K-9, choferes de tractor y automatización WMS. Lo que no sube se queda en tierra.
 
-Flight numbers, AWBs and shippers are fictional.
+Los vuelos, guías aéreas y embarcadores son ficticios.
