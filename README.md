@@ -30,7 +30,7 @@ Study names, the site and all patients are fictional. This is an educational gam
 
 ## Almacén de Exportación de Diego (`export/index.html`)
 
-En español. Un turno nocturno en un almacén de exportación de carga aérea, con el mismo plano que el piso de Diego: andenes R1–R6 con básculas, mostrador de exportación, zonas de almacén A y B con inspección K-9, tres carriles de preparación, dos áreas de paletizado de PMC y puertas de salida a las posiciones A/C 1 y A/C 2.
+En español y en 3D (three.js). Un turno nocturno en un almacén de exportación de carga aérea, con el mismo plano que el piso de Diego: andenes R1–R6 con básculas, mostrador de exportación, zonas de almacén A y B con inspección K-9, tres carriles de preparación, dos áreas de paletizado de PMC y puertas de salida a las posiciones A/C 1 y A/C 2.
 
 Once cargueros salen entre las 21:00 y las 04:30. Cada pieza recorre andén → báscula → mostrador (guía aérea) → almacén → inspección K-9 → carril de preparación → armado de PMC → tractor → avión antes de que su vuelo despegue.
 
@@ -39,6 +39,8 @@ Once cargueros salen entre las 21:00 y las 04:30. Cada pieza recorre andén → 
 - Decide en las **discrepancias de peso** de la guía y lleva las alertas K-9 a la jaula de retención.
 - **Eventos con decisiones**: carga urgente de un cliente, retrasar un vuelo, montacargas descompuesto, horas extra del K-9 y tormentas eléctricas que cierran la plataforma.
 - **Bonos** por vuelo perfecto y rachas, dinero flotante, sonidos (botón Sonido/Mudo) y ficha de información al pasar el cursor.
+- **Cámara 3D**: arrastra el piso para moverte; con dos dedos pellizca para acercar, gira para rotar y desliza para inclinar (en computadora: rueda y clic derecho). Botones ⟲, VISTA y TODO.
+- **Sonido de almacén** sintetizado en vivo: zumbido de lámparas, ventilación, banda transportadora, golpes metálicos, motores y alarmas de reversa de montacargas, frenos de aire de camiones, turbinas, altavoz de último llamado y ladridos del K-9.
 - Gasta en agentes, montacargas, equipos K-9, choferes de tractor y automatización WMS. Lo que no sube se queda en tierra.
 
 Los vuelos, guías aéreas y embarcadores son ficticios.
